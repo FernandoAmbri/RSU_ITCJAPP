@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">RSU-ITCJAPP</string>
+    <string name="btn_coordinador">Coordinador</string>
+    <string name="btn_alumno">Alumno</string>
+    <string name="btn_entrar_alumno">Entrar</string>
+    <string name="btn_crear_cuenta">Crear cuenta</string>
+
+    <!--
+       Opciones del menu
+    -->
+
+    <!--
+        Accesibilidad
+    -->
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <!--
+        Departamentos
+    -->
+
+    <string-array name="departamentos">
+        <item>Departamento Económico-Administrativo</item>
+        <item>Departamento de Ciencias Básicas</item>
+        <item>Departamento de Electrónica</item>
+        <item>Departamento de Metal-Mecánica</item>
+        <item>Departamento Académico</item>
+        <item>Departamento de Industrial y Logística</item>
+        <item>Biblioteca</item>
+        <item>Departamento de Sistemas Computacionales</item>
+        <item>Centro de Idiomas</item>
+        <item>Posgrado</item>
+    </string-array>
+
+</resources>

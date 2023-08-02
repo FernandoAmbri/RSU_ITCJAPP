@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "485775028340",
+    "project_id": "rsuitcj-app",
+    "storage_bucket": "rsuitcj-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:485775028340:android:84a2c8c0bed4f42d87a121",
+        "android_client_info": {
+          "package_name": "com.example.rsu_itcjapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "485775028340-j9fueg5qd8g512a6hk21diqrarhihcom.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rsu_itcjapp",
+            "certificate_hash": "1d4476cfb0815ba52569f96e6f54bd3389efc443"
+          }
+        },
+        {
+          "client_id": "485775028340-9rkj276vlbj8l14hlivqhega02jfthld.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpyZagHiaVKg4jV5DqE--3haEp6GxCPnE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "485775028340-9rkj276vlbj8l14hlivqhega02jfthld.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="@color/white"
+    tools:context=".OpcionesMenuAlumno">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.24">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_nombre_residuo_p"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:hint="Nombre del residuo peligroso:" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_cantidad_residuo_p"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Cantidad generada Kg:"
+                    android:text="0"
+                    android:inputType="numberDecimal"
+                    android:background="@color/white"
+                    android:textColor="@color/black"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="15dp"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Código de peligrosidad (CPR):"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <CheckBox
+                        android:id="@+id/ckb_C"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="C"
+                        android:textColor="@color/black"
+                        android:layout_weight="1"
+                        android:onClick="seleccionarCodigoPeligrosidad"
+                        />
+
+                    <CheckBox
+                        android:id="@+id/ckb_R"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="R"
+                        android:textColor="@color/black"
+                        android:layout_weight="1"
+                        android:onClick="seleccionarCodigoPeligrosidad"
+                        />
+
+                    <CheckBox
+                        android:id="@+id/ckb_E"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="E"
+                        android:textColor="@color/black"
+                        android:layout_weight="1"
+                        android:onClick="seleccionarCodigoPeligrosidad"
+                        />
+
+                    <CheckBox
+                        android:id="@+id/ckb_T"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="T"
+                        android:textColor="@color/black"
+                        android:layout_weight="1"
+                        android:onClick="seleccionarCodigoPeligrosidad"
+                        />
+
+                    <CheckBox
+                        android:id="@+id/ckb_I"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="I"
+                        android:textColor="@color/black"
+                        android:layout_weight="1"
+                        android:onClick="seleccionarCodigoPeligrosidad"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                    <CheckBox
+                        android:id="@+id/ckb_B"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="B"
+                        android:textColor="@color/black"
+                        android:layout_weight="1"
+                        android:onClick="seleccionarCodigoPeligrosidad"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_manifiesto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="0"
+                    android:hint="No. De manifiesto:"
+                    android:background="@color/white"
+                    android:textColor="@color/black"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_fecha_residuos_p"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="Fecha de registro:"
+                    android:background="@color/white"
+                    android:textColor="@color/black"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_residuos_peligrosos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:textAllCaps="false"
+                android:text="Registrar"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:backgroundTint="@color/orange" />
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
