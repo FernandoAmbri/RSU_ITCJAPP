@@ -1,94 +1,90 @@
 package com.example.rsu_itcjapp;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.DatePickerDialog;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.example.rsu_itcjapp.datos.Alumno;
-import com.example.rsu_itcjapp.datos.Usuario;
+import com.example.rsu_itcjapp.datos.DatabaseSGA;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Locale;
+import java.util.HashMap;
 
 public class RegistroUsuario extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase db;
-    private DatabaseReference dbRef;
+    private DatabaseSGA databaseSGA;
+    private String usuario = "";
+    private HashMap<String, String> residenciasInicio;
+    private HashMap<String, String> residenciasFin;
 
     private Button btnRegistroUsuario;
-    private TextInputEditText txtNombre, txtApellidos, txtArea, txtMatricula,
-                                    txtCorreo, txtPassword, txtFechaInicio, txtFechaFinal;
-
-    private String usuario = "";
+    private TextInputEditText txtNombre, txtApellidoPaterno, txtApellidoMaterno, txtMatricula,
+                                txtCorreo, txtPassword, txtFechaInicio, txtFechaFinal;
+    private AutoCompleteTextView actCarreras, actAreasTrabajo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_usuario);
 
-        usuario = (String) getIntent().getExtras().get(LoginUsuarios.OPCION);
+        usuario = (String) getIntent().getExtras().get(Constantes.USUARIO);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
-        db.setPersistenceEnabled(true);
+        databaseSGA = new DatabaseSGA();
+        residenciasInicio = new HashMap<>();
+        residenciasFin = new HashMap<>();
 
-        dbRef = db.getReference("DB_RSUITCJ/"+usuario);
-
-
-        btnRegistroUsuario = (Button) findViewById(R.id.btn_registrar_usuario);
-        txtNombre = (TextInputEditText) findViewById(R.id.txt_nombre_alumno_reg);
-        txtApellidos = (TextInputEditText) findViewById(R.id.txt_apellidos_usuario);
-        txtArea = (TextInputEditText) findViewById(R.id.txt_area_alumno_reg);
+        txtNombre = (TextInputEditText) findViewById(R.id.txt_nombre_usuario_reg);
+        txtApellidoPaterno = (TextInputEditText) findViewById(R.id.txt_apellido_paterno_reg);
+        txtApellidoMaterno = (TextInputEditText) findViewById(R.id.txt_apellido_materno_reg);
+        actAreasTrabajo = (AutoCompleteTextView) findViewById(R.id.act_area_trabajo);
+        actCarreras = (AutoCompleteTextView) findViewById(R.id.act_carrera_reg);
         txtMatricula = (TextInputEditText) findViewById(R.id.txt_matricula);
         txtCorreo = (TextInputEditText) findViewById(R.id.txt_correo_usuario);
         txtPassword = (TextInputEditText) findViewById(R.id.txt_password_usuario);
         txtFechaInicio = (TextInputEditText) findViewById(R.id.txt_fecha_inicio_reg);
         txtFechaFinal = (TextInputEditText) findViewById(R.id.txt_fecha_final_reg);
+        btnRegistroUsuario = (Button) findViewById(R.id.btn_registrar_usuario);
 
+        String [] areasArray = getResources().getStringArray(R.array.areasTrabajo);
+        String [] carrerasArray = getResources().getStringArray(R.array.carreras);
+
+        ArrayAdapter<String> areasAdapter =
+                new ArrayAdapter<>(this, R.layout.dropdown_menu, areasArray);
+        ArrayAdapter<String> carrerasAdapter =
+                new ArrayAdapter<>(this, R.layout.dropdown_menu, carrerasArray);
+
+        actAreasTrabajo.setAdapter(areasAdapter);
+        actCarreras.setAdapter(carrerasAdapter);
 
         txtFechaInicio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setDatePicker(txtFechaInicio);
+                residenciasInicio =
+                        Interfaz.setDatePicker(txtFechaInicio, RegistroUsuario.this);
             }
         });
 
         txtFechaFinal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setDatePicker(txtFechaFinal);
+                residenciasFin =
+                        Interfaz.setDatePicker(txtFechaFinal, RegistroUsuario.this);
             }
         });
 
         btnRegistroUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    registrarUsuario();
-                } catch (Exception e) {
-                    Toast.makeText(RegistroUsuario.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    System.out.println(e.getMessage());
-                }
-
+                ocultarTeclado(view);
+                registrarUsuario();
             }
         });
 
@@ -97,82 +93,85 @@ public class RegistroUsuario extends AppCompatActivity {
     @Override
     public void onStart(){
         super.onStart();
-        FirebaseUser usuarioActual = mAuth.getCurrentUser();
-        if(usuarioActual != null){
-            mostrarMenu();
+        if(databaseSGA.getUser() != null){
+            databaseSGA.mostrarMenu(RegistroUsuario.this, Constantes.USUARIO,
+                    Constantes.USER_DATA);
         }
     }
 
-    public void mostrarMenu() {
-        Intent menu = new Intent(RegistroUsuario.this, MenuUsuarios.class);
-        menu.putExtra(LoginUsuarios.OPCION, usuario);
-        startActivity(menu);
+    private void ocultarTeclado(View view) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public void registrarUsuario() throws Exception {
+    private void registrarUsuario() {
 
         String nombre = txtNombre.getText().toString().trim();
-        String apellidos = txtApellidos.getText().toString().trim();
-        String area = txtArea.getText().toString().trim();
+        String apellidoPaterno = txtApellidoPaterno.getText().toString().trim();
+        String apellidoMaterno = txtApellidoMaterno.getText().toString().trim();
+        String area = actAreasTrabajo.getText().toString();
+        String carrera = actCarreras.getText().toString();
         String matricula = txtMatricula.getText().toString().trim();
         String correo = txtCorreo.getText().toString().trim();
         String password = txtPassword.getText().toString().trim();
         String fechaInicio = txtFechaInicio.getText().toString();
-        String fechaFinal = txtFechaFinal.getText().toString();
+        String fechaFin = txtFechaFinal.getText().toString();
 
-        if(nombre.isEmpty() || apellidos.isEmpty() || area.isEmpty() || matricula.isEmpty()
-                || correo.isEmpty() || password.isEmpty() || fechaInicio.isEmpty() || fechaFinal.isEmpty()){
+        if(matricula.length() < 8) {
+            Toast.makeText(RegistroUsuario.this,
+                    "La matricula no es correcta.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(correo.isEmpty() || password.isEmpty()) {
             Toast.makeText(RegistroUsuario.this, "Campos vacios", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        if(nombre.isEmpty() || apellidoPaterno.isEmpty() || apellidoMaterno.isEmpty()
+                || area.isEmpty() || carrera.isEmpty()){
+            Toast.makeText(RegistroUsuario.this, "Campos vacios", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        mAuth.createUserWithEmailAndPassword(correo, password).
+        if(fechaInicio.isEmpty() || fechaFin.isEmpty()) {
+            Toast.makeText(RegistroUsuario.this, "Falta capturar fecha inicio/fin.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        Alumno alumno = new Alumno(nombre, apellidoPaterno, apellidoMaterno, area, usuario,
+                carrera, Integer.parseInt(matricula), residenciasInicio, residenciasFin);
+
+        databaseSGA.getAuth().createUserWithEmailAndPassword(correo, password).
                 addOnCompleteListener(RegistroUsuario.this,
                 new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(Task<AuthResult> task) {
                         if(task.isSuccessful()){
-
                             String userId = task.getResult().getUser().getUid();
-
-                            Alumno alumno = new Alumno(nombre, apellidos, area, Integer.parseInt(matricula) ,
-                                    correo, password, fechaInicio, fechaFinal);
-
-                            dbRef.child(userId).setValue(alumno);
-
-                            Toast.makeText(getApplicationContext(), "Cuenta registrada",
-                                    Toast.LENGTH_SHORT).show();
-                            mostrarMenu();
+                            databaseSGA.registrarCuenta(alumno, userId, RegistroUsuario.this);
+                            databaseSGA.mostrarMenu(RegistroUsuario.this, Constantes.USUARIO,
+                                    Constantes.USER_DATA);
 
                         } else {
-                            Toast.makeText(RegistroUsuario.this, correo, Toast.LENGTH_SHORT).show();
-                            Toast.makeText(getApplicationContext(), "Error al registrar la cuenta",
+                            Toast.makeText(getApplicationContext(), "Error al registrar la cuenta.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-    }
 
-    private void setDatePicker(TextInputEditText textView){
-        final Calendar date = Calendar.getInstance();
-
-        int year = date.get(Calendar.YEAR);
-        int month = date.get(Calendar.MONTH);
-        int day = date.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(RegistroUsuario.this,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {
-                        int monthFinal = month + 1;
-                        String date = day+"/"+(monthFinal)+"/"+year;
-                        if(monthFinal < 10) {
-                            date = day+"/"+"0"+(monthFinal)+"/"+year;
-                        }
-                        textView.setText(date);
-                    }
-                }, year, month, day);
-        datePickerDialog.show();
+        txtNombre.setText("");
+        txtApellidoPaterno.setText("");
+        txtApellidoMaterno.setText("");
+        actAreasTrabajo.setText("");
+        actCarreras.setText("");
+        txtMatricula.setText("");
+        txtCorreo.setText("");
+        txtPassword.setText("");
+        txtFechaInicio.setText("");
+        txtFechaFinal.setText("");
     }
 }

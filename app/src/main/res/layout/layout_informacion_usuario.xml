@@ -59,7 +59,7 @@
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txt_apellidos_inf"
+                    android:id="@+id/txt_apellidoPaterno_inf"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="false"
@@ -69,7 +69,30 @@
                     android:background="@color/white"
                     android:inputType="text"
                     android:textColor="@color/black"
-                    android:hint="Apellidos:" />
+                    android:hint="Apellido paterno:" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txt_apellidoMaterno_inf"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:background="@color/white"
+                    android:inputType="text"
+                    android:textColor="@color/black"
+                    android:hint="Apellido materno:" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,15 +112,39 @@
                     android:cursorVisible="false"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-                    android:hint="Área:"
+                    android:hint="Área trabajo:"
                     android:inputType="text"
                     android:background="@color/white"
                     android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_carrera_inf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txt_carrera_inf"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="Carrera:"
+                    android:inputType="text"
+                    android:background="@color/white"
+                    android:textColor="@color/black"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_matricula_inf"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
@@ -142,6 +189,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
+                android:id="@+id/layout_fechas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -214,15 +262,15 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btn_eliminar_cuenta"
+                android:id="@+id/btn_cerrar_sesion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="15dp"
                 android:textAllCaps="false"
-                android:text="Eliminar cuenta"
+                android:text="Cerrar Sesión"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:backgroundTint="@color/orange" />
+                app:backgroundTint="@color/red_600" />
 
         </LinearLayout>
 

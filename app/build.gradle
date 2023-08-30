@@ -7,7 +7,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.rsu_itcjapp"
+        applicationId "com.example.sga_itcjapp"
         minSdk 24
         targetSdk 34
         versionCode 1

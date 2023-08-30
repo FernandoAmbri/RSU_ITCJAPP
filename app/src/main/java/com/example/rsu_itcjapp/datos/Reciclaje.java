@@ -1,5 +1,7 @@
 package com.example.rsu_itcjapp.datos;
 
+import java.util.HashMap;
+
 public class Reciclaje extends Bitacora {
 
     private int tapasRecolectadas;
@@ -10,9 +12,9 @@ public class Reciclaje extends Bitacora {
 
     }
 
-    public Reciclaje(Usuario usuario, String fecha, int tapasRecolectadas,
-                                        int botellasRecolectadas, int botesAluminio) {
-        super(usuario, fecha);
+    public Reciclaje(Usuario usuario, HashMap<String, String> fechaIngreso, int tapasRecolectadas,
+                     int botellasRecolectadas, int botesAluminio) {
+        super(usuario, fechaIngreso);
         this.tapasRecolectadas = tapasRecolectadas;
         this.botellasRecolectadas = botellasRecolectadas;
         this.botesAluminio = botesAluminio;

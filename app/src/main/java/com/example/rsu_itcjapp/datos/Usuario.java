@@ -1,26 +1,32 @@
 package com.example.rsu_itcjapp.datos;
 
-public class Usuario {
+import java.io.Serializable;
+import java.util.HashMap;
+
+public class Usuario implements Serializable {
 
     private String nombre;
-    private String apellidos;
-    private String correo;
-    private String password;
+    private String apellidoPaterno;
+    private String apellidoMaterno;
+    private String area;
+    private String tipo;
 
     public Usuario(){
 
     }
 
-    public Usuario(String nombre, String apellidos) {
+    public Usuario(String nombre, String apellidoPaterno, String apellidoMaterno) {
         this.nombre = nombre;
-        this.apellidos = apellidos;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
     }
 
-    public Usuario(String nombre, String apellidos, String correo, String password) {
+    public Usuario(String nombre, String apellidoPaterno, String apellidoMaterno, String area, String tipo) {
         this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.correo = correo;
-        this.password = password;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
+        this.area = area;
+        this.tipo = tipo;
     }
 
     public String getNombre() {
@@ -31,27 +37,35 @@ public class Usuario {
         this.nombre = nombre;
     }
 
-    public String getApellidos() {
-        return apellidos;
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
     }
 
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
     }
 
-    public String getCorreo() {
-        return correo;
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
     }
 
-    public String getPassword() {
-        return password;
+    public String getArea() {
+        return area;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 }

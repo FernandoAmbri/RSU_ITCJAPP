@@ -8,19 +8,19 @@
     android:orientation="vertical"
     android:padding="20dp"
     android:background="@color/white"
-    tools:context=".MenuUsuarios">
+    tools:context=".OpcionesMenuCoord">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:text="Alumnos:"
+        android:text="Reporte bimestral:"
         android:textSize="20sp"
         android:textColor="@color/black"
         android:textStyle="bold" />
 
     <ListView
-        android:id="@+id/list_view"
+        android:id="@+id/list_reportes_bimestral"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"/>

@@ -8,18 +8,9 @@
     android:background="@color/white"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="296dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.181"
-        android:background="@color/white"
-        android:src="@drawable/itcj_logo" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -27,19 +18,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.74">
+        app:layout_constraintVertical_bias="0.4">
+
+        <ImageView
+            android:id="@+id/img_itcj_logo"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
+            android:src="@drawable/itcj_logo" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
+            android:src="@drawable/sga" />
 
         <Button
             android:id="@+id/btn_coordinador"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
             android:padding="15sp"
             android:text="@string/btn_coordinador"
-            android:textSize="20sp"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:layout_marginBottom="10dp"
-            app:backgroundTint="@color/orange" />
+            android:textSize="20sp"
+            app:backgroundTint="@color/red_600" />
 
         <Button
             android:id="@+id/btn_alumno"
@@ -47,10 +53,10 @@
             android:layout_height="wrap_content"
             android:padding="15sp"
             android:text="@string/btn_alumno"
-            android:textSize="20sp"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            app:backgroundTint="@color/orange" />
+            android:textSize="20sp"
+            app:backgroundTint="@color/red_600" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

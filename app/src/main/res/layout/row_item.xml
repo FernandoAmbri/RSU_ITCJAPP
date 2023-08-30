@@ -37,7 +37,7 @@
             android:gravity="left"
             android:textColor="@color/black"
             android:textSize="20dp"
-            android:text="Opciones"/>
+            android:text=""/>
 
     </LinearLayout>
 

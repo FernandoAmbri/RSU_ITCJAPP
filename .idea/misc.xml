@@ -3,34 +3,39 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.138" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/drawable/border_layout.xml" value="0.15" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.15" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/drawable/ic_baseline_assignment_24.xml" value="0.15" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.15" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/drawable/ic_launcher_background.xml" value="0.138" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_enviar_correo.xml" value="0.17119565217391305" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_informacion_alumno.xml" value="0.15675675675675677" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_login_alumno.xml" value="0.13664596273291926" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_login_coordinador.xml" value="0.16983695652173914" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_login_usuario.xml" value="0.16983695652173914" />
-        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_main.xml" value="0.18" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_menu_alumno.xml" value="0.11885245901639344" />
-        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_menu_usuario.xml" value="0.16983695652173914" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_menu_usuario.xml" value="0.25" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_opciones_menu.xml" value="0.17119565217391305" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_opciones_menu_coord.xml" value="0.16983695652173914" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_registro_alumno.xml" value="0.13664596273291926" />
-        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_registro_usuario.xml" value="0.12149532710280374" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/activity_registro_usuario.xml" value="0.25" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/dropdown_menu.xml" value="0.17119565217391305" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/generar_aviso.xml" value="0.16983695652173914" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_eliminar_cuenta_alumno.xml" value="0.15675675675675677" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_enviar_correo.xml" value="0.13551401869158877" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_generar_aviso.xml" value="0.25" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_informacion_alumno.xml" value="0.1598360655737705" />
-        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_marcadores_pilas.xml" value="0.12149532710280374" />
-        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_reciclaje.xml" value="0.1598360655737705" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_informacion_usuario.xml" value="0.1766304347826087" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_marcadores_pilas.xml" value="0.1680327868852459" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_reciclaje.xml" value="0.2" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_reporte_alumnos_bimestral.xml" value="0.16983695652173914" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_reporte_alumnos_final.xml" value="0.16983695652173914" />
-        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_residuos_peligrosos.xml" value="0.18" />
-        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_sistema_riego.xml" value="0.11885245901639344" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_residuos_peligrosos.xml" value="0.22" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/layout_sistema_riego.xml" value="0.22" />
         <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/row_item.xml" value="0.33" />
+        <entry key="..\:/Users/ferna/AndroidStudioProjects/RSU_ITCJAPP/app/src/main/res/layout/row_item_reporte.xml" value="0.2" />
       </map>
     </option>
   </component>

@@ -29,19 +29,22 @@
             app:layout_constraintVertical_bias="0.24">
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:textColorHint="@color/black"
                 app:hintTextAppearance="@style/hintText">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_nombre_residuo_p"
+                <AutoCompleteTextView
+                    android:id="@+id/act_categoria_rsp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@color/white"
-                    android:textColor="@color/black"
-                    android:hint="Nombre del residuo peligroso:" />
+                    android:inputType="none"
+                    android:hint="Residuo:"
+                    android:textColor="@color/black" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -57,8 +60,8 @@
                     android:id="@+id/tie_cantidad_residuo_p"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Cantidad generada Kg:"
-                    android:text="0"
+                    android:hint="Cantidad generada Kg/L:"
+                    android:text=""
                     android:inputType="numberDecimal"
                     android:background="@color/white"
                     android:textColor="@color/black"/>
@@ -168,8 +171,8 @@
                     android:id="@+id/tie_manifiesto"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
                     android:text="0"
+                    android:inputType="number"
                     android:hint="No. De manifiesto:"
                     android:background="@color/white"
                     android:textColor="@color/black"/>
@@ -185,18 +188,107 @@
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_fecha_residuos_p"
+                    android:id="@+id/tie_fecha_ingreso_rsp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="false"
                     android:cursorVisible="false"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-                    android:hint="Fecha de registro:"
+                    android:hint="Fecha de ingreso:"
                     android:background="@color/white"
                     android:textColor="@color/black"/>
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_fecha_salida_rsp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="Fecha de salida:"
+                    android:background="@color/white"
+                    android:textColor="@color/black"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_fase_manejo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_fase_manejo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:hint="Fase de manejo:" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_prestador_servicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_prestador_servicio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:hint="Nombre, denominación o razón social:" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_num_autorizacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_numero_autorizacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:text="0"
+                    android:inputType="number"
+                    android:hint="Número de autorización:" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_seccion_manejo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:textAllCaps="false"
+                android:text="Sección manejo"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                app:backgroundTint="@color/white" />
 
             <Button
                 android:id="@+id/btn_residuos_peligrosos"
@@ -207,7 +299,7 @@
                 android:text="Registrar"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:backgroundTint="@color/orange" />
+                app:backgroundTint="@color/red_600" />
         </LinearLayout>
 
     </ScrollView>

@@ -6,17 +6,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+import com.example.rsu_itcjapp.datos.DatabaseSGA;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnAlumno, btnCoordinador;
-    public static final String [] USUARIOS = {"Coordinador", "Alumnos"};
+
+    private DatabaseSGA databaseSGA;
+    private Button btnAlumno, btnCoordinador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        databaseSGA = new DatabaseSGA();
 
         btnAlumno = (Button) findViewById(R.id.btn_alumno);
         btnCoordinador = (Button) findViewById(R.id.btn_coordinador);
@@ -25,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, LoginUsuarios.class);
-                intent.putExtra(LoginUsuarios.OPCION, USUARIOS[1]);
+                intent.putExtra(Constantes.USUARIO, Constantes.USUARIO_ALUMNO);
                 startActivity(intent);
             }
         });
@@ -34,10 +37,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, LoginUsuarios.class);
-                intent.putExtra(LoginUsuarios.OPCION, USUARIOS[0]);
+                intent.putExtra(Constantes.USUARIO, Constantes.USUARIO_DOCENTE);
                 startActivity(intent);
             }
         });
 
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        if(databaseSGA.getUser() != null) {
+            databaseSGA.mostrarMenu(MainActivity.this,
+                            Constantes.USUARIO, Constantes.USER_DATA);
+        }
     }
 }

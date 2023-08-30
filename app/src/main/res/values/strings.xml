@@ -5,19 +5,6 @@
     <string name="btn_entrar_alumno">Entrar</string>
     <string name="btn_crear_cuenta">Crear cuenta</string>
 
-    <!--
-       Opciones del menu
-    -->
-
-    <!--
-        Accesibilidad
-    -->
-    <!-- TODO: Remove or change this placeholder text -->
-
-    <!--
-        Departamentos
-    -->
-
     <string-array name="departamentos">
         <item>Departamento Económico-Administrativo</item>
         <item>Departamento de Ciencias Básicas</item>
@@ -29,6 +16,59 @@
         <item>Departamento de Sistemas Computacionales</item>
         <item>Centro de Idiomas</item>
         <item>Posgrado</item>
+    </string-array>
+
+    <string-array name="rspCategorias">
+        <item>Aceites y Lubricantes</item>
+        <item>Agua Contaminada</item>
+        <item>Agua Fosa</item>
+        <item>Balastras</item>
+        <item>Basura Industrial</item>
+        <item>Lámparas Fluorescentes</item>
+        <item>Reactivos Caducos</item>
+        <item>Recipientes</item>
+    </string-array>
+
+    <string-array name="carreras">
+        <item>Licenciatura en Administración</item>
+        <item>Contador Público</item>
+        <item>Ingeniería Electromecánica</item>
+        <item>Ingeniería Mecánica</item>
+        <item>Ingeniería en Sistemas Computacionales</item>
+        <item>Ingeniería Electrónica</item>
+        <item>Ingeniería en Tecnologías de la Información y Comunicaciones</item>
+        <item>Ingeniería en Gestión Empresarial</item>
+        <item>Ingeniería Eléctrica</item>
+        <item>Ingeniería Industrial</item>
+        <item>Ingeniería en Logística</item>
+        <item>Ingeniería en Mecatrónica</item>
+    </string-array>
+
+    <string-array name="areasTrabajo">
+        <item>Reciclaje</item>
+        <item>Marcadores y Pilas</item>
+        <item>Residuos Peligrosos</item>
+        <item>Sistema de Riego</item>
+    </string-array>
+
+    <string-array name="opcionesMarcadores">
+        <item>Marcadores</item>
+        <item>Pilas</item>
+        <item>Toners</item>
+    </string-array>
+
+    <string-array name="turnosRiego">
+        <item>Matutino</item>
+        <item>Vespertino</item>
+        <item>Diurno</item>
+        <item>Nocturno</item>
+    </string-array>
+
+    <string-array name="tipoRiego">
+        <item>Por goteo</item>
+        <item>Aspersor</item>
+        <item>Manguera</item>
+        <item>Automatizado</item>
     </string-array>
 
 </resources>

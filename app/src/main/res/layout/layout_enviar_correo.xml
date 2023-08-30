@@ -83,7 +83,7 @@
             android:text="Enviar"
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:backgroundTint="@color/orange" />
+            app:backgroundTint="@color/red_600" />
 
     </LinearLayout>
 

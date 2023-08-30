@@ -33,6 +33,7 @@
                 android:background="@color/white"
                 android:inputType="textEmailAddress"
                 android:hint="Correo institucional" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -64,7 +65,7 @@
             android:textSize="20sp"
             android:text="@string/btn_entrar_alumno"
             android:textColor="@color/white"
-            android:backgroundTint="@color/orange"/>
+            android:backgroundTint="@color/red_600"/>
 
         <Button
             android:id="@+id/btn_registrar_cuenta"

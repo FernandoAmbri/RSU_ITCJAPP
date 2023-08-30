@@ -26,8 +26,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.24000001">
-
+            app:layout_constraintVertical_bias="0.24">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -37,7 +36,7 @@
                 app:hintTextAppearance="@style/hintText">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txt_nombre_alumno_reg"
+                    android:id="@+id/txt_nombre_usuario_reg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
@@ -48,19 +47,18 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginBottom="20dp"
                 android:textColorHint="@color/black"
-                app:hintTextAppearance="@style/hintText"
-                >
+                app:hintTextAppearance="@style/hintText">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txt_apellidos_usuario"
+                    android:id="@+id/txt_apellido_paterno_reg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:background="@color/white"
-                    android:hint="Apellidos:" />
+                    android:hint="Apellido paterno:" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -71,16 +69,56 @@
                 android:textColorHint="@color/black"
                 app:hintTextAppearance="@style/hintText"
                 >
+
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txt_area_alumno_reg"
+                    android:id="@+id/txt_apellido_materno_reg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:background="@color/white"
-                    android:hint="Área:" />
+                    android:hint="Apellido materno:" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText">
+
+                <AutoCompleteTextView
+                    android:id="@+id/act_area_trabajo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/white"
+                    android:inputType="none"
+                    android:hint="Área:"
+                    android:textColor="@color/black" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText">
+
+                <AutoCompleteTextView
+                    android:id="@+id/act_carrera_reg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/white"
+                    android:inputType="none"
+                    android:hint="Carrera:"
+                    android:textColor="@color/black" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -196,11 +234,11 @@
                         android:id="@+id/txt_fecha_final_reg"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:clickable="false"
-                        android:cursorVisible="false"
+
+
                         android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:hint="Final:"
+
+                        android:hint="Fin:"
                         android:background="@color/white"
                         android:textColor="@color/black"/>
 
@@ -220,7 +258,7 @@
                 android:text="Registrar"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:backgroundTint="@color/orange" />
+                app:backgroundTint="@color/red_600" />
 
         </LinearLayout>
 

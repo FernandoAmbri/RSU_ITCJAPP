@@ -2,200 +2,211 @@ package com.example.rsu_itcjapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.icu.number.IntegerWidth;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.rsu_itcjapp.datos.Alumno;
-import com.example.rsu_itcjapp.datos.Bitacora;
+import com.example.rsu_itcjapp.datos.DatabaseSGA;
 import com.example.rsu_itcjapp.datos.MarcadoresPilas;
 import com.example.rsu_itcjapp.datos.Reciclaje;
 import com.example.rsu_itcjapp.datos.ResiduosPeligrosos;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
+import com.example.rsu_itcjapp.datos.SistemaRiego;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class OpcionesMenuAlumno extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase db;
-    private DatabaseReference dbRef;
     private Alumno alumno;
-    private String userId = "", nombre = "";
-    private ArrayList<String> codigosPeligrosidad = new ArrayList<>();
+    private String idUsuario = "";
+    private Integer codigosPeligrosidad = 0;
 
-    public static final String OPCION_MENU = "opcionId";
+    private final ArrayList<Integer> opcionesLayout = new ArrayList<>();
 
-    int [] opcionesLayout = {R.layout.layout_reciclaje, R.layout.layout_marcadores_pilas,
-                                R.layout.layout_residuos_peligrosos, R.layout.layout_sistema_riego,
-                                R.layout.layout_enviar_correo, R.layout.layout_informacion_alumno};
+    private HashMap<String, String> fechaIngreso;
+    private HashMap<String, String> fechaSalida;
+    private HashMap<String, Boolean> peligrosidad;
+
+    private DatabaseSGA databaseSGA;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int opcionSeleccionada = (Integer) getIntent().getExtras().get(OPCION_MENU);
-        setContentView(opcionesLayout[opcionSeleccionada]);
 
-        mAuth = FirebaseAuth.getInstance();
-        userId = mAuth.getUid();
-        db = FirebaseDatabase.getInstance();
+        Bundle bundle = getIntent().getExtras();
 
-        dbRef = db.getReference("DB_RSUITCJ");
+        int opcionSeleccionada = (Integer) bundle.get(Constantes.OPCION_MENU_ID);
+        int primerLayout = (Integer) bundle.get(Constantes.LAYOUT);
+        alumno = (Alumno) bundle.getSerializable(Constantes.USUARIO_ALUMNO);
 
-        obtenerDatosUsuario(opcionSeleccionada);
+        opcionesLayout.add(primerLayout);
+        opcionesLayout.add(R.layout.layout_enviar_correo);
+        opcionesLayout.add(R.layout.layout_informacion_usuario);
 
+        setContentView(opcionesLayout.get(opcionSeleccionada));
+
+        databaseSGA = new DatabaseSGA();
+        idUsuario = databaseSGA.getUser().getUid();
+
+        fechaIngreso = new HashMap<>();
+        fechaSalida = new HashMap<>();
+
+        restablecerFechas();
+
+        peligrosidad = new HashMap<>();
+
+        establecerPeligrosidad();
+
+        seleccionarLayout(opcionSeleccionada, alumno);
     }
 
     @Override
     public void onStart(){
         super.onStart();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if(user == null){
+        if(databaseSGA.getUser() == null){
             Intent pantallaInicio = new Intent(OpcionesMenuAlumno.this, MainActivity.class);
             startActivity(pantallaInicio);
         }
     }
 
-    public void obtenerDatosUsuario(int opcionSeleccionada) {
-
-        dbRef.child("Alumnos").child(userId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                Alumno alumno = snapshot.getValue(Alumno.class);
-                seleccionarLayout(opcionSeleccionada, alumno);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                Toast.makeText(OpcionesMenuAlumno.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void seleccionarLayoutRegistro(Alumno alumno) {
+        switch(alumno.getArea()) {
+            case Constantes.REC:
+                registrarDatosReciclaje(alumno);
+                break;
+            case Constantes.MPT:
+                registrarDatosMarcadoresPilas(alumno);
+                break;
+            case Constantes.STAR:
+                registrarDatosSistemaRiego(alumno);
+                break;
+            default:
+                registrarDatosResiduosPeligrosos(alumno);
+                break;
+        }
     }
 
     private void seleccionarLayout(int opcionSeleccionada, Alumno alumno) {
-        switch(opcionSeleccionada){
+        switch(opcionSeleccionada) {
             case 0:
-                registrarDatosReciclaje(alumno);
+                seleccionarLayoutRegistro(alumno);
                 break;
             case 1:
-                registrarDatosMarcadoresPilas(alumno);
+                enviarCorreo();
                 break;
             case 2:
-                registrarDatosResiduosPeligrosos(alumno);
-                break;
-            case 3:
-                registrarDatosSistemaRiego(alumno);
-                break;
-            case 4:
-                EnviarCorreo();
-                break;
-            case 5:
                 mostrarDatosCuenta(alumno);
                 break;
         }
     }
 
-    private String establecerFecha() {
-        final Calendar date = Calendar.getInstance();
+    private void ocultarTeclado(View view) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
-        int year = date.get(Calendar.YEAR);
-        int month = date.get(Calendar.MONTH) + 1;
-        int day = date.get(Calendar.DAY_OF_MONTH);
+    public void establecerPeligrosidad() {
+        peligrosidad.put("biologicoInfeccioso", false);
+        peligrosidad.put("corrosivo", false);
+        peligrosidad.put("explosivo", false);
+        peligrosidad.put("inflamable", false);
+        peligrosidad.put("reactivo", false);
+        peligrosidad.put("toxico", false);
+    }
 
-        String fecha = day + "-" + month + "-" + year;
-        if(month < 10) fecha = day+"-"+"0"+(month)+"-"+year;
+    public void restablecerFechas() {
+        fechaIngreso.put("anho", "0000");
+        fechaIngreso.put("mes", "00");
+        fechaIngreso.put("dia", "00");
 
-        return fecha;
+        fechaSalida.put("anho", "0000");
+        fechaSalida.put("mes", "00");
+        fechaSalida.put("dia", "00");
     }
 
     private void registrarDatosReciclaje(Alumno alumno) {
+        String nodo = "reciclaje";
+        String path = "contadores/reciclajeContador";
 
         TextInputEditText txtTapasRec = (TextInputEditText) findViewById(R.id.tie_tapas_rec);
         TextInputEditText txtBotellas = (TextInputEditText) findViewById(R.id.tie_botellas_rec);
         TextInputEditText txtBotesAlum = (TextInputEditText) findViewById(R.id.tie_botes_alum);
-        TextInputEditText txtFechaRec = (TextInputEditText) findViewById(R.id.tie_fecha_rec);
+        TextInputEditText txtFecha = (TextInputEditText) findViewById(R.id.tie_fecha_rec);
+
         Button btnReciclaje = (Button) findViewById(R.id.btn_reciclaje);
 
-        txtFechaRec.setOnClickListener(new View.OnClickListener(){
+        txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
-                setDatePicker(txtFechaRec);
+            public void onClick(View view) {
+                fechaIngreso = Interfaz.setDatePicker(txtFecha, OpcionesMenuAlumno.this);
             }
         });
+
+        databaseSGA.verificarNodo(nodo, getApplicationContext());
 
         btnReciclaje.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                int cantidadTapas = Integer.parseInt(txtTapasRec.getText().toString().trim());
-                int cantidadBotellas = Integer.parseInt(txtBotellas.getText().toString().trim());
-                int botesAluminio = Integer.parseInt(txtBotesAlum.getText().toString().trim());
-                String fecha = txtFechaRec.getText().toString();
+                String cantidadTapas = txtTapasRec.getText().toString().trim();
+                String cantidadBotellas = txtBotellas.getText().toString().trim();
+                String botesAluminio = txtBotesAlum.getText().toString().trim();
+                String fecha = txtFecha.getText().toString();
 
-                if(cantidadTapas == 0 && cantidadBotellas == 0 && botesAluminio == 0) {
+                int tapas = 0, botellas = 0, botes = 0;
+
+                if(!TextUtils.isEmpty(cantidadTapas)) {
+                    tapas = Integer.parseInt(cantidadTapas);
+                }
+
+                if(!TextUtils.isEmpty(cantidadBotellas)) {
+                    botellas = Integer.parseInt(cantidadBotellas);
+                }
+
+                if(!TextUtils.isEmpty(botesAluminio)) {
+                    botes = Integer.parseInt(botesAluminio);
+                }
+
+                if(tapas < 1 && botellas < 1 && botes < 1) {
                     Toast.makeText(OpcionesMenuAlumno.this,
-                                    "Es necesario introducir una cantidad.", Toast.LENGTH_SHORT).show();
+                            "Es necesario introducir una cantidad.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(TextUtils.isEmpty(fecha)) {
+                if(fecha.isEmpty()) {
                     Toast.makeText(OpcionesMenuAlumno.this,
-                            "Es necesario introducir la fecha.", Toast.LENGTH_SHORT).show();
+                            "Falta introducir la fecha.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                Reciclaje reciclaje = new Reciclaje(new Alumno(alumno.getNombre(),
-                            alumno.getApellidos(), alumno.getMatricula()), fecha, cantidadTapas,
-                                cantidadBotellas, botesAluminio);
+                ocultarTeclado(view);
 
-                String key = dbRef.child("Reciclaje").push().getKey();
-                String finalKey = key + "-" + establecerFecha();
-                dbRef.child("Reciclaje").child(key).removeValue();
+                Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
+                                                alumno.getApellidoMaterno(), alumno.getMatricula());
+                Reciclaje reciclaje = new Reciclaje(alum, fechaIngreso, tapas, botellas, botes);
+                databaseSGA.registrarDatosBitacora(path, nodo, reciclaje, getApplicationContext());
 
-                dbRef.child("Reciclaje").child(finalKey).setValue(reciclaje).
-                            addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(Task<Void> task) {
-                        Toast.makeText(OpcionesMenuAlumno.this, "Registro guardado.",
-                                        Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(OpcionesMenuAlumno.this, e.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                txtTapasRec.setText("0");
-                txtBotellas.setText("0");
-                txtBotesAlum.setText("0");
-                txtFechaRec.setText("");
-
+                txtTapasRec.setText("");
+                txtBotellas.setText("");
+                txtBotesAlum.setText("");
+                txtFecha.setText("");
             }
         });
 
@@ -203,29 +214,34 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
     private void registrarDatosMarcadoresPilas(Alumno alumno) {
 
-        TextInputEditText txtMarcadores = (TextInputEditText) findViewById(R.id.tie_marcadores);
-        AutoCompleteTextView actMarcadores = (AutoCompleteTextView) findViewById(R.id.act_marcadores);
-        TextInputEditText txtPilas = (TextInputEditText) findViewById(R.id.tie_pilas);
-        AutoCompleteTextView actPilas = (AutoCompleteTextView) findViewById(R.id.act_pilas);
-        TextInputEditText txtToners = (TextInputEditText) findViewById(R.id.tie_toners);
-        AutoCompleteTextView actToners = (AutoCompleteTextView) findViewById(R.id.act_toners);
-        TextInputEditText txtFechaMarcadores = (TextInputEditText) findViewById(R.id.tie_fecha_marcadores);
+        AutoCompleteTextView actCategoria = (AutoCompleteTextView) findViewById(R.id.act_categoria_mpt);
+        TextInputEditText txtCantidad = (TextInputEditText) findViewById(R.id.tie_cantidad_mpt);
+        AutoCompleteTextView actDepartamento = (AutoCompleteTextView) findViewById(R.id.act_departamento_mpt);
+        TextInputEditText txtFecha = (TextInputEditText) findViewById(R.id.tie_fecha_mpt);
 
         Button btnMarcadores = (Button) findViewById(R.id.btn_marcadores_pilas);
 
         String [] departamentosInstituto = getResources().getStringArray(R.array.departamentos);
+        String [] categorias = getResources().getStringArray(R.array.opcionesMarcadores);
 
         ArrayAdapter<String> adapterDepartamento =
                 new ArrayAdapter<>(this, R.layout.dropdown_menu, departamentosInstituto);
 
-        actMarcadores.setAdapter(adapterDepartamento);
-        actPilas.setAdapter(adapterDepartamento);
-        actToners.setAdapter(adapterDepartamento);
+        ArrayAdapter<String> adapterCategorias =
+                new ArrayAdapter<>(this, R.layout.dropdown_menu, categorias);
 
-        txtFechaMarcadores.setOnClickListener(new View.OnClickListener() {
+        actDepartamento.setAdapter(adapterDepartamento);
+        actCategoria.setAdapter(adapterCategorias);
+
+        databaseSGA.verificarNodo("marcadores", getApplicationContext());
+        databaseSGA.verificarNodo("pilas", getApplicationContext());
+        databaseSGA.verificarNodo("toners", getApplicationContext());
+
+        txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setDatePicker(txtFechaMarcadores);
+                fechaIngreso =
+                        Interfaz.setDatePicker(txtFecha, OpcionesMenuAlumno.this);
             }
         });
 
@@ -233,189 +249,237 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
            @Override
            public void onClick(View view) {
 
-               int cantidadMarcadores = Integer.parseInt(txtMarcadores.getText().toString());
-               String depMarcadores = actMarcadores.getText().toString();
-               int cantidadPilas = Integer.parseInt(txtPilas.getText().toString());
-               String depPilas = actPilas.getText().toString();
-               int cantidadToners = Integer.parseInt(txtToners.getText().toString());
-               String depToners = actToners.getText().toString();
-               String fecha = txtFechaMarcadores.getText().toString();
+               String categoriaMpt = actCategoria.getText().toString().toLowerCase();
+               String cantidad = txtCantidad.getText().toString().trim();
+               String departamento = actDepartamento.getText().toString();
+               String fecha = txtFecha.getText().toString();
+               String path = "contadores"+"/"+categoriaMpt+"Contador";
 
-               if(cantidadMarcadores == 0 && cantidadPilas == 0 && cantidadToners == 0) {
-                   Toast.makeText(OpcionesMenuAlumno.this,
-                            "Es necesario introducir una cantidad.", Toast.LENGTH_SHORT).show();
-                    return;
-               }
-
-               if((cantidadMarcadores > 0 && TextUtils.isEmpty(depMarcadores))
-                    || (cantidadPilas > 0 && TextUtils.isEmpty(depPilas))
-                        || (cantidadToners > 0 && TextUtils.isEmpty(depToners))) {
-                   Toast.makeText(OpcionesMenuAlumno.this,
-                           "Es necesario introducir un departamento.", Toast.LENGTH_SHORT).show();
+               if(categoriaMpt.isEmpty() || cantidad.isEmpty() || departamento.isEmpty()) {
+                   Toast.makeText(OpcionesMenuAlumno.this, "Campo vacío.",
+                           Toast.LENGTH_SHORT).show();
                    return;
                }
 
-               if(TextUtils.isEmpty(fecha)) {
-                   Toast.makeText(OpcionesMenuAlumno.this,
-                           "Es necesario introducir la fecha.", Toast.LENGTH_SHORT).show();
+               int cantidadMpt = Integer.parseInt(cantidad);
+
+               if(cantidadMpt < 1) {
+                   Toast.makeText(OpcionesMenuAlumno.this, "Cantidad no valida.",
+                           Toast.LENGTH_SHORT).show();
                    return;
                }
 
-               Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidos(), alumno.getMatricula());
-               MarcadoresPilas marcadoresPilas = new MarcadoresPilas(alum, fecha, cantidadMarcadores,
-                                    depMarcadores, cantidadPilas, depPilas, cantidadToners, depToners);
+               if(fecha.isEmpty()) {
+                   Toast.makeText(OpcionesMenuAlumno.this, "Falta introducir la fecha.",
+                           Toast.LENGTH_SHORT).show();
+                   return;
+               }
 
-               String key = dbRef.child("MarcadoresPilasToners").push().getKey();
-               String finalKey = key + "-" + establecerFecha();
-               dbRef.child("MarcadoresPilasToners").child(key).removeValue();
+               ocultarTeclado(view);
 
-               dbRef.child("MarcadoresPilasToners")
-                    .child(finalKey)
-                    .setValue(marcadoresPilas)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(Task<Void> task) {
-                            Toast.makeText(OpcionesMenuAlumno.this, "Registro guardado.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                   .addOnFailureListener(new OnFailureListener() {
-                       @Override
-                       public void onFailure(Exception e) {
-                           Toast.makeText(OpcionesMenuAlumno.this, e.getMessage(),
-                                   Toast.LENGTH_SHORT).show();
-                       }
-                   });
+               Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
+                                                alumno.getApellidoMaterno(), alumno.getMatricula());
+               MarcadoresPilas marcadoresPilas = new MarcadoresPilas(alum, fechaIngreso, cantidadMpt, departamento);
+               databaseSGA.registrarDatosBitacora(path, categoriaMpt, marcadoresPilas, getApplicationContext());
+
+               txtCantidad.setText("");
+               actDepartamento.setText("");
+               actCategoria.setText("");
+               txtFecha.setText("");
            }
         });
 
     }
 
-    public void modificarCodigosPeligrosidad(boolean seleccionado, String codigo) {
+    public void modificarPeligrosidad(boolean seleccionado, String codigo) {
         if(seleccionado) {
-            codigosPeligrosidad.add(codigo);
+            peligrosidad.replace(codigo, true);
+            codigosPeligrosidad += 1;
             return;
         }
-        int indice = codigosPeligrosidad.indexOf(codigo);
-        codigosPeligrosidad.remove(indice);
+        peligrosidad.replace(codigo, false);
+        codigosPeligrosidad -= 1;
     }
 
     public void seleccionarCodigoPeligrosidad(View view) {
         boolean seleccionado = ((CheckBox) view).isChecked();
+        final int ckbC = R.id.ckb_C;
 
         switch(view.getId()){
-            case R.id.ckb_C:
-                modificarCodigosPeligrosidad(seleccionado, "C");
+            case ckbC:
+                modificarPeligrosidad(seleccionado, "corrosivo");
                 break;
             case R.id.ckb_R:
-                modificarCodigosPeligrosidad(seleccionado, "R");
+                modificarPeligrosidad(seleccionado, "reactivo");
                 break;
             case R.id.ckb_E:
-                modificarCodigosPeligrosidad(seleccionado, "E");
+                modificarPeligrosidad(seleccionado, "explosivo");
                 break;
             case R.id.ckb_T:
-                modificarCodigosPeligrosidad(seleccionado, "T");
+                modificarPeligrosidad(seleccionado, "toxico");
                 break;
             case R.id.ckb_I:
-                modificarCodigosPeligrosidad(seleccionado, "I");
+                modificarPeligrosidad(seleccionado, "inflamable");
                 break;
             case R.id.ckb_B:
-                modificarCodigosPeligrosidad(seleccionado, "B");
+                modificarPeligrosidad(seleccionado, "biologicoInfeccioso");
                 break;
         }
     }
 
-    private void registrarDatosResiduosPeligrosos(Alumno alumno) {
+    private void limpiarcheckBoxes() {
+        ((CheckBox) findViewById(R.id.ckb_C)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_R)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_E)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_T)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_I)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_B)).setChecked(false);
+    }
 
-        TextInputEditText txtNombreResiduo = (TextInputEditText) findViewById(R.id.tie_nombre_residuo_p);
+    private void registrarDatosResiduosPeligrosos(Alumno alumno) {
+        String nodo = "rsp";
+        String path = "rspContador/rspBitacoraContador";
+
+        TextInputLayout tilFaseManejo = (TextInputLayout) findViewById(R.id.til_fase_manejo);
+        TextInputLayout tilPrestadorServicio = (TextInputLayout) findViewById(R.id.til_prestador_servicio);
+        TextInputLayout tilNumAuto = (TextInputLayout) findViewById(R.id.til_num_autorizacion);
+
+        AutoCompleteTextView actResiduo = (AutoCompleteTextView) findViewById(R.id.act_categoria_rsp);
         TextInputEditText txtCantidadResiduo = (TextInputEditText) findViewById(R.id.tie_cantidad_residuo_p);
+        TextInputEditText txtFechaIngreso = (TextInputEditText) findViewById(R.id.tie_fecha_ingreso_rsp);
+        TextInputEditText txtFechaSalida = (TextInputEditText) findViewById(R.id.tie_fecha_salida_rsp);
         TextInputEditText txtNoManifiesto = (TextInputEditText) findViewById(R.id.tie_manifiesto);
-        TextInputEditText txtFechaResiduoP = (TextInputEditText) findViewById(R.id.tie_fecha_residuos_p);
+        TextInputEditText txtFaseManejo = (TextInputEditText) findViewById(R.id.tie_fase_manejo);
+        TextInputEditText txtPrestadorServicio = (TextInputEditText) findViewById(R.id.tie_prestador_servicio);
+        TextInputEditText txtNumeroAut = (TextInputEditText) findViewById(R.id.tie_numero_autorizacion);
 
         Button btnResiduosPeligrosos = (Button) findViewById(R.id.btn_residuos_peligrosos);
+        Button btnSeccionManejo = (Button) findViewById(R.id.btn_seccion_manejo);
 
-        txtFechaResiduoP.setOnClickListener(new View.OnClickListener() {
+        String [] categorias = getResources().getStringArray(R.array.rspCategorias);
+        ArrayAdapter<String> categoriasAdapter =
+                new ArrayAdapter<>(this, R.layout.dropdown_menu, categorias);
+
+        actResiduo.setAdapter(categoriasAdapter);
+
+        tilFaseManejo.setVisibility(View.GONE);
+        tilPrestadorServicio.setVisibility(View.GONE);
+        tilNumAuto.setVisibility(View.GONE);
+
+        actResiduo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setDatePicker(txtFechaResiduoP);
+                restablecerFechas();
+            }
+        });
+
+        txtFechaIngreso.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fechaIngreso =
+                        Interfaz.setDatePicker(txtFechaIngreso, OpcionesMenuAlumno.this);
+            }
+        });
+
+        txtFechaSalida.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fechaSalida =
+                        Interfaz.setDatePicker(txtFechaSalida, OpcionesMenuAlumno.this);
+            }
+        });
+
+        btnSeccionManejo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(tilFaseManejo.getVisibility() == View.GONE) {
+
+                    tilFaseManejo.setVisibility(View.VISIBLE);
+                    tilPrestadorServicio.setVisibility(View.VISIBLE);
+                    tilNumAuto.setVisibility(View.VISIBLE);
+
+                } else if(tilFaseManejo.getVisibility() == View.VISIBLE) {
+
+                    tilFaseManejo.setVisibility(View.GONE);
+                    tilPrestadorServicio.setVisibility(View.GONE);
+                    tilNumAuto.setVisibility(View.GONE);
+                }
             }
         });
 
         btnResiduosPeligrosos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String nombreResiduo = actResiduo.getText().toString();
+                String cantidadResiduoKg = txtCantidadResiduo.getText().toString().trim();
+                String noManifiesto = txtNoManifiesto.getText().toString().trim();
+                String faseManejo = txtFaseManejo.getText().toString().trim();
+                String prestadorServicio = txtPrestadorServicio.getText().toString().trim();
+                String numeroAutorizacion = txtNumeroAut.getText().toString().trim();
 
-                String nombreResiduo = txtNombreResiduo.getText().toString().trim();
-                float cantidadResiduoKg = Float.parseFloat(txtCantidadResiduo.getText().toString());
-                int noManifiesto = Integer.parseInt(txtNoManifiesto.getText().toString());
-                String fecha = txtFechaResiduoP.getText().toString();
+                float residuoKg = 0;
+                int numManifiesto = 0;
+                int numAutorizacion = 0;
 
-                if(TextUtils.isEmpty(nombreResiduo)) {
-                    Toast.makeText(OpcionesMenuAlumno.this, "Campo vacio.",
+                if(!TextUtils.isEmpty(cantidadResiduoKg)) {
+                    residuoKg = Float.parseFloat(cantidadResiduoKg);
+                }
+
+                if(!TextUtils.isEmpty(noManifiesto)) {
+                    numManifiesto = Integer.parseInt(noManifiesto);
+                }
+
+                if(!TextUtils.isEmpty(numeroAutorizacion)) {
+                    numAutorizacion = Integer.parseInt(numeroAutorizacion);
+                }
+
+                if(TextUtils.isEmpty(nombreResiduo) ) {
+                    Toast.makeText(OpcionesMenuAlumno.this, "Falta seleccionar residuo.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(cantidadResiduoKg == 0 || Float.toString(cantidadResiduoKg) == "") {
-                    Toast.makeText(OpcionesMenuAlumno.this, "Cantidad de residuo no valida.",
+                if(residuoKg < 1) {
+                    Toast.makeText(OpcionesMenuAlumno.this, "Falta cantidad residuo.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(codigosPeligrosidad.size() == 0) {
-                    Toast.makeText(OpcionesMenuAlumno.this, "Falta seleccionar CPR.",
-                            Toast.LENGTH_SHORT).show();
+                if(codigosPeligrosidad <= 0) {
+                    Toast.makeText(OpcionesMenuAlumno.this,
+                            "Falta seleccionar código(s) de peligrosidad.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(noManifiesto == 0 || Integer.toString(noManifiesto) == "") {
-                    Toast.makeText(OpcionesMenuAlumno.this, "No. De manifiesto no valido.",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                ocultarTeclado(view);
 
-                if(TextUtils.isEmpty(fecha)) {
-                    Toast.makeText(OpcionesMenuAlumno.this, "Falta seleccionar la fecha.",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                ResiduosPeligrosos residuosPeligrosos =
+                        new ResiduosPeligrosos(fechaIngreso, idUsuario, prestadorServicio, nombreResiduo,
+                                faseManejo, alumno.getMatricula(), residuoKg, fechaSalida, peligrosidad,
+                                numManifiesto, numAutorizacion);
 
-                Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidos(), alumno.getMatricula());
-                ResiduosPeligrosos residuosPeligrosos = new ResiduosPeligrosos(alum, fecha, nombreResiduo,
-                                         cantidadResiduoKg, codigosPeligrosidad.toString(), noManifiesto);
+                databaseSGA.registrarDatosBitacora(path, nodo, residuosPeligrosos, getApplicationContext());
 
-
-                String key = dbRef.child("ResiduosPeligrosos").push().getKey();
-                String finalKey = key + "-" + establecerFecha();
-                dbRef.child("ResiduosPeligrosos").child(key).removeValue();
-
-                dbRef.child("ResiduosPeligrosos")
-                        .child(finalKey)
-                        .setValue(residuosPeligrosos)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(Task<Void> task) {
-                                Toast.makeText(OpcionesMenuAlumno.this, "Registro guardado.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(Exception e) {
-                                Toast.makeText(OpcionesMenuAlumno.this, e.getMessage(),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
+                actResiduo.setText("");
+                txtCantidadResiduo.setText("");
+                txtNoManifiesto.setText("");
+                txtFechaIngreso.setText("");
+                txtFechaSalida.setText("");
+                txtPrestadorServicio.setText("");
+                txtNumeroAut.setText("");
+                codigosPeligrosidad = 0;
+                limpiarcheckBoxes();
             }
         });
     }
 
     private void registrarDatosSistemaRiego(Alumno alumno) {
+        String nodo = "sistemaRiego";
+        String path = "contadores/sistemaRiegoContador";
 
         TextInputEditText txtArea = (TextInputEditText) findViewById(R.id.tie_area_riego);
-        TextInputEditText txtTipo = (TextInputEditText) findViewById(R.id.tie_tipo_riego);
-        TextInputEditText txtTurno = (TextInputEditText) findViewById(R.id.tie_turno_riego);
+        AutoCompleteTextView actTipo = (AutoCompleteTextView) findViewById(R.id.act_tipo_riego);
+        AutoCompleteTextView actTurno = (AutoCompleteTextView) findViewById(R.id.act_turno_riego);
         TextInputEditText txtFechaRiego = (TextInputEditText) findViewById(R.id.tie_fecha_riego);
         TextInputEditText txtHoraInicio = (TextInputEditText) findViewById(R.id.tie_hora_riego);
         TextInputEditText txtDuracion = (TextInputEditText) findViewById(R.id.tie_duracion_riego);
@@ -423,13 +487,23 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
         Button btnSistemaRiego = (Button) findViewById(R.id.btn_sistema_riego);
 
-        Toast.makeText(OpcionesMenuAlumno.this, alumno.getAreaTrabajo() + alumno.getApellidos(), Toast.LENGTH_SHORT).show();
+        String [] tiposRiego = getResources().getStringArray(R.array.tipoRiego);
+        ArrayAdapter<String> tiposRiegoAdapter =
+                new ArrayAdapter<>(this, R.layout.dropdown_menu, tiposRiego);
+        actTipo.setAdapter(tiposRiegoAdapter);
 
+        String [] turnos = getResources().getStringArray(R.array.turnosRiego);
+        ArrayAdapter<String> turnosRiegoAdapter =
+                new ArrayAdapter<>(this, R.layout.dropdown_menu, turnos);
+        actTurno.setAdapter(turnosRiegoAdapter);
+
+        databaseSGA.verificarNodo(nodo, getApplicationContext());
 
         txtFechaRiego.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setDatePicker(txtFechaRiego);
+                fechaIngreso =
+                        Interfaz.setDatePicker(txtFechaRiego, OpcionesMenuAlumno.this);
             }
         });
 
@@ -445,9 +519,9 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                             @Override
                             public void onTimeSet(TimePicker timePicker, int h, int m) {
                                 String time = h+":"+m;
-                                if(m < 10) {
-                                    time = h+":0"+m;
-                                }
+
+                                if(m < 10) time = h+":0"+m;
+
                                 txtHoraInicio.setText(time);
                             }
                         }, hour, minute, DateFormat.is24HourFormat(OpcionesMenuAlumno.this));
@@ -455,10 +529,60 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
             }
         });
 
+        btnSistemaRiego.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String area = txtArea.getText().toString().trim();
+                String tipoRiego = actTipo.getText().toString();
+                String turno = actTurno.getText().toString();
+                String fechaRiego = txtFechaRiego.getText().toString();
+                String horaRiego = txtHoraInicio.getText().toString();
+                String duracion = txtDuracion.getText().toString().trim();
+                String observaciones = txtObservaciones.getText().toString().trim();
+
+
+                if(TextUtils.isEmpty(area) || TextUtils.isEmpty(tipoRiego) || TextUtils.isEmpty(turno)
+                        || TextUtils.isEmpty(horaRiego) || TextUtils.isEmpty(duracion)) {
+                            Toast.makeText(OpcionesMenuAlumno.this, "Campo vacio.",
+                                Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(fechaRiego.isEmpty()) {
+                    Toast.makeText(OpcionesMenuAlumno.this,
+                            "Falta introducir la fecha.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                int duracionRiego = Integer.parseInt(duracion);
+
+                if(duracionRiego < 1) {
+                    Toast.makeText(OpcionesMenuAlumno.this,
+                            "El valor de duración no es correcto.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                ocultarTeclado(view);
+                Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
+                                                alumno.getApellidoMaterno(), alumno.getMatricula());
+                SistemaRiego sistemaRiego = new SistemaRiego(alum, fechaIngreso, area, tipoRiego, turno,
+                                                        horaRiego, duracionRiego, observaciones);
+                databaseSGA.registrarDatosBitacora(path, nodo, sistemaRiego, getApplicationContext());
+
+                txtArea.setText("");
+                actTipo.setText("");
+                actTurno.setText("");
+                txtFechaRiego.setText("");
+                txtHoraInicio.setText("");
+                txtDuracion.setText("");
+                txtObservaciones.setText("");
+            }
+        });
 
     }
 
-    private void EnviarCorreo() {
+    private void enviarCorreo() {
 
         TextInputEditText txtDestinatario = (TextInputEditText) findViewById(R.id.tie_correo_destinatario);
         TextInputEditText txtAsunto = (TextInputEditText) findViewById(R.id.tie_asunto_correo);
@@ -474,16 +598,28 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 String asunto = txtAsunto.getText().toString();
                 String mensaje = txtMensaje.getText().toString();
 
+                if(destinatario.isEmpty() || asunto.isEmpty() || mensaje.isEmpty()) {
+                    Toast.makeText(OpcionesMenuAlumno.this,
+                            "Campos vacíos.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                ocultarTeclado(view);
+
                 Intent correo = new Intent(Intent.ACTION_SEND);
 
-                correo.putExtra(correo.EXTRA_EMAIL, new String[]{destinatario});
-                correo.putExtra(correo.EXTRA_SUBJECT, asunto);
-                correo.putExtra(correo.EXTRA_TEXT, mensaje);
+                correo.putExtra(Intent.EXTRA_EMAIL, new String[]{destinatario});
+                correo.putExtra(Intent.EXTRA_SUBJECT, asunto);
+                correo.putExtra(Intent.EXTRA_TEXT, mensaje);
 
                 correo.setData(Uri.parse("mailto:"));
                 correo.setType("text/plain");
 
                 startActivity(Intent.createChooser(correo, "Enviar correo"));
+
+                txtDestinatario.setText("");
+                txtAsunto.setText("");
+                txtMensaje.setText("");
             }
         });
     }
@@ -491,51 +627,47 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
     private void mostrarDatosCuenta(Alumno alumno) {
 
         TextInputEditText txtNombreUsuario = (TextInputEditText) findViewById(R.id.txt_nombre_inf);
-        TextInputEditText txtApellidosUsuario = (TextInputEditText) findViewById(R.id.txt_apellidos_inf);
+        TextInputEditText txtApellidoPaterno = (TextInputEditText) findViewById(R.id.txt_apellidoPaterno_inf);
+        TextInputEditText txtApellidoMaterno = (TextInputEditText) findViewById(R.id.txt_apellidoMaterno_inf);
         TextInputEditText txtArea = (TextInputEditText) findViewById(R.id.txt_area_inf);
+        TextInputEditText txtCarrera = (TextInputEditText) findViewById(R.id.txt_carrera_inf);
         TextInputEditText txtMatricula = (TextInputEditText) findViewById(R.id.txt_matricula_inf);
         TextInputEditText txtCorreo = (TextInputEditText) findViewById(R.id.txt_correo_inf);
         TextInputEditText txtFechaInicio = (TextInputEditText) findViewById(R.id.txt_fecha_inicio_inf);
         TextInputEditText txtFechaFinal = (TextInputEditText) findViewById(R.id.txt_fecha_final_inf);
 
-        Button btnEliminarCuenta = (Button) findViewById(R.id.btn_eliminar_cuenta);
+        Button btnCerrarSesion = (Button) findViewById(R.id.btn_cerrar_sesion);
 
         txtNombreUsuario.setText(alumno.getNombre());
-        txtApellidosUsuario.setText(alumno.getApellidos());
-        txtArea.setText(alumno.getAreaTrabajo());
+        txtApellidoPaterno.setText(alumno.getApellidoPaterno());
+        txtApellidoMaterno.setText(alumno.getApellidoMaterno());
+        txtArea.setText(alumno.getArea());
+        txtCarrera.setText(alumno.getCarrera());
         txtMatricula.setText(String.valueOf(alumno.getMatricula()));
-        txtCorreo.setText(alumno.getCorreo());
-        txtFechaInicio.setText(alumno.getFechaInicio());
-        txtFechaFinal.setText(alumno.getFechaFinal());
+        txtCorreo.setText(databaseSGA.getUser().getEmail());
 
-        btnEliminarCuenta.setOnClickListener(new View.OnClickListener() {
+        String fechaInicio = alumno.getResidenciasInicio().get("dia")+"/"
+                +alumno.getResidenciasInicio().get("mes")+"/"+alumno.getResidenciasInicio().get("anho");
+
+        String fechaFin = alumno.getResidenciasFin().get("dia")+"/"
+                +alumno.getResidenciasFin().get("mes")+"/"+alumno.getResidenciasFin().get("anho");
+
+        txtFechaInicio.setText(fechaInicio);
+        txtFechaFinal.setText(fechaFin);
+
+        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                databaseSGA.getAuth().signOut();
+                if(databaseSGA.getAuth() == null) {
+                    Toast.makeText(OpcionesMenuAlumno.this,
+                            "Sesión finalizada.", Toast.LENGTH_SHORT).show();
+                    Intent pantallaInicio = new Intent(OpcionesMenuAlumno.this,
+                            MainActivity.class);
+                    startActivity(pantallaInicio);
+                }
             }
         });
 
-    }
-
-    private void setDatePicker(TextInputEditText textView){
-        final Calendar date = Calendar.getInstance();
-
-        int year = date.get(Calendar.YEAR);
-        int month = date.get(Calendar.MONTH);
-        int day = date.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(OpcionesMenuAlumno.this,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {
-                        int monthFinal = month + 1;
-                        String date = day+"/"+(monthFinal)+"/"+year;
-                        if(monthFinal < 10) {
-                            date = day+"/"+"0"+(monthFinal)+"/"+year;
-                        }
-                        textView.setText(date);
-                    }
-                }, year, month, day);
-        datePickerDialog.show();
     }
 }

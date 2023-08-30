@@ -28,6 +28,27 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.24000001">
 
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/black"
+                app:hintTextAppearance="@style/hintText">
+
+                <AutoCompleteTextView
+                    android:id="@+id/act_categoria_mpt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/white"
+                    android:inputType="none"
+                    android:hint="Categoría:"
+                    android:textColor="@color/black" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,12 +57,11 @@
                 app:hintTextAppearance="@style/hintText">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_marcadores"
+                    android:id="@+id/tie_cantidad_mpt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
-                    android:hint="Marcadores:"
-                    android:text="0"
+                    android:hint="Cantidad:"
                     android:inputType="number"
                     android:textColor="@color/black" />
 
@@ -56,7 +76,7 @@
                 app:hintTextAppearance="@style/hintText">
 
                 <AutoCompleteTextView
-                    android:id="@+id/act_marcadores"
+                    android:id="@+id/act_departamento_mpt"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -75,85 +95,7 @@
                 app:hintTextAppearance="@style/hintText">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_pilas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:hint="Pilas:"
-                    android:text="0"
-                    android:inputType="number"
-                    android:textColor="@color/black" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:textColorHint="@color/black"
-                app:hintTextAppearance="@style/hintText">
-
-                <AutoCompleteTextView
-                    android:id="@+id/act_pilas"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@color/white"
-                    android:inputType="none"
-                    android:hint="Departamento:"
-                    android:textColor="@color/black" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:textColorHint="@color/black"
-                app:hintTextAppearance="@style/hintText">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_toners"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:hint="Toners:"
-                    android:text="0"
-                    android:inputType="number"
-                    android:textColor="@color/black" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:textColorHint="@color/black"
-                app:hintTextAppearance="@style/hintText">
-
-                <AutoCompleteTextView
-                    android:id="@+id/act_toners"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@color/white"
-                    android:inputType="none"
-                    android:hint="Departamento:"
-                    android:textColor="@color/black" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:textColorHint="@color/black"
-                app:hintTextAppearance="@style/hintText">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_fecha_marcadores"
+                    android:id="@+id/tie_fecha_mpt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
@@ -166,6 +108,7 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+
             <Button
                 android:id="@+id/btn_marcadores_pilas"
                 android:layout_width="match_parent"
@@ -175,7 +118,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:backgroundTint="@color/orange" />
+                app:backgroundTint="@color/red_600" />
 
         </LinearLayout>
 

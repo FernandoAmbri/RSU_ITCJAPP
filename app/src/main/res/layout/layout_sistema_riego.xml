@@ -47,37 +47,41 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:textColorHint="@color/black"
                 app:hintTextAppearance="@style/hintText">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_tipo_riego"
+                <AutoCompleteTextView
+                    android:id="@+id/act_tipo_riego"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@color/white"
+                    android:inputType="none"
                     android:hint="Tipo de riego:"
-                    android:inputType="text"
                     android:textColor="@color/black" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:textColorHint="@color/black"
                 app:hintTextAppearance="@style/hintText">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/tie_turno_riego"
+                <AutoCompleteTextView
+                    android:id="@+id/act_turno_riego"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@color/white"
+                    android:inputType="none"
                     android:hint="Turno:"
-                    android:inputType="text"
                     android:textColor="@color/black" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -169,7 +173,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:backgroundTint="@color/orange" />
+                app:backgroundTint="@color/red_600" />
 
         </LinearLayout>
 

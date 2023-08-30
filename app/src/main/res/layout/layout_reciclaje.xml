@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:text="0"
+                android:text=""
                 android:inputType="number"
                 android:textColor="@color/black"
                 android:hint="Tapas recolectadas" />
@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Botellas recolectadas"
-                android:text="0"
+                android:text=""
                 android:inputType="number"
                 android:background="@color/white"
                 android:textColor="@color/black"/>
@@ -70,7 +70,7 @@
                 android:id="@+id/tie_botes_alum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="0"
+                android:text=""
                 android:inputType="number"
                 android:hint="Botes de aluminio"
                 android:background="@color/white"
@@ -78,13 +78,14 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:textColorHint="@color/black"
-            app:hintTextAppearance="@style/hintText"
-            >
+            app:hintTextAppearance="@style/hintText">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/tie_fecha_rec"
@@ -110,7 +111,7 @@
             android:text="Registrar"
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:backgroundTint="@color/orange" />
+            app:backgroundTint="@color/red_600" />
 
     </LinearLayout>
 

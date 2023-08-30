@@ -1,17 +1,23 @@
 package com.example.rsu_itcjapp.datos;
 
+import java.util.HashMap;
+
 public class Bitacora {
 
-    Usuario usuario;
-    String fecha;
+    private Usuario usuario;
+    private HashMap<String, String> fechaIngreso;
 
     public Bitacora(){
 
     }
 
-    public Bitacora(Usuario usuario, String fecha){
+    public Bitacora(HashMap<String, String> fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
+
+    public Bitacora(Usuario usuario, HashMap<String, String> fechaIngreso){
         this.usuario = usuario;
-        this.fecha = fecha;
+        this.fechaIngreso = fechaIngreso;
     }
 
     public Usuario getUsuario() {
@@ -22,11 +28,11 @@ public class Bitacora {
         this.usuario = usuario;
     }
 
-    public String getFecha() {
-        return fecha;
+    public HashMap<String, String> getFechaIngreso() {
+        return fechaIngreso;
     }
 
-    public void setFecha(String fecha) {
-        this.fecha = fecha;
+    public void setFechaIngreso(HashMap<String, String> fecha) {
+        this.fechaIngreso = fecha;
     }
 }
