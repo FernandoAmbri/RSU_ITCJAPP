@@ -10,12 +10,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.rsu_itcjapp.datos.DatabaseSGA;
+import com.example.rsu_itcjapp.db.DatabaseSGA;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
+
+import java.util.regex.Pattern;
 
 public class LoginUsuarios extends AppCompatActivity {
 
@@ -36,7 +38,7 @@ public class LoginUsuarios extends AppCompatActivity {
 
         // Instancia de firebase
 
-        databaseSGA = new DatabaseSGA();
+        databaseSGA = new DatabaseSGA(LoginUsuarios.this);
 
         //Componentes de interfaz
 
@@ -45,7 +47,7 @@ public class LoginUsuarios extends AppCompatActivity {
         txtCorreo = (TextInputEditText) findViewById(R.id.txt_correo_login);
         txtPassword = (TextInputEditText) findViewById(R.id.txt_password_login);
 
-        // Ocultar botón de registro para usuario tipo coordinador y trabajador
+        // Ocultar botón de registro para usuarios tipo coordinador
 
         if (usuario.equals(Constantes.USUARIO_DOCENTE)
                 || usuario.equals(Constantes.USUARIO_TRABAJADOR)) {
@@ -64,8 +66,32 @@ public class LoginUsuarios extends AppCompatActivity {
         btnEntrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String correo = txtCorreo.getText().toString().trim();
+                String contrasena = txtPassword.getText().toString().trim();
+
+                String expresion = "^[\\w+_.-]+@[\\w+.-]+$";
+                Pattern pattern = Pattern.compile(expresion, Pattern.CASE_INSENSITIVE);
+
                 ocultarTeclado(view);
-                iniciarSesion();
+
+                if (correo.isEmpty()) {
+                    txtCorreo.setError("Campo vacio");
+                    return;
+                }
+
+                if (contrasena.isEmpty()) {
+                    txtPassword.setError("Campo vacio");
+                    return;
+                }
+
+                if (!pattern.matcher(correo).matches()) {
+                    txtCorreo.setError("Formato no válido");
+                    return;
+                }
+
+                iniciarSesion(correo, contrasena);
+                txtCorreo.setText("");
+                txtPassword.setText("");
             }
         });
     }
@@ -73,10 +99,9 @@ public class LoginUsuarios extends AppCompatActivity {
     @Override
     public void onStart(){
         super.onStart();
-        // Si el usuario ya inició sesión, mostrar menú principal
-        if(databaseSGA.getUser() != null){
-            databaseSGA.mostrarMenu(LoginUsuarios.this,
-                    Constantes.USUARIO, Constantes.USER_DATA);
+        if (databaseSGA.getUser() != null) {
+            databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
+            finish();
         }
     }
 
@@ -86,28 +111,19 @@ public class LoginUsuarios extends AppCompatActivity {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    private void iniciarSesion(){
-
-        String correo = txtCorreo.getText().toString().trim();
-        String password = txtPassword.getText().toString().trim();
-
-        if(correo.isEmpty() || password.isEmpty()) {
-            Toast.makeText(LoginUsuarios.this, "Campos vacios", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    private void iniciarSesion(String correo, String password){
         databaseSGA.getAuth().signInWithEmailAndPassword(correo, password)
              .addOnCompleteListener(LoginUsuarios.this,
                 new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            databaseSGA.mostrarMenu(LoginUsuarios.this, Constantes.USUARIO,
-                                                        Constantes.USER_DATA);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Error al iniciar sesión.",
-                                    Toast.LENGTH_SHORT).show();
+                            databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
+                            finish();
+                            return;
                         }
+                        Toast.makeText(getApplicationContext(), "Error al iniciar sesión.",
+                                    Toast.LENGTH_SHORT).show();
                     }
             })
             .addOnFailureListener(LoginUsuarios.this, new OnFailureListener() {

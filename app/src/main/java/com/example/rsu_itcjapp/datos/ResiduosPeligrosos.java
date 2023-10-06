@@ -4,13 +4,11 @@ import java.util.HashMap;
 
 public class ResiduosPeligrosos extends Bitacora {
 
-    private String idUsuario;
     private String prestadorServicio;
     private String residuo;
     private String faseManejo;
     private int matriculaUsuario;
     private float cantidadGenerada;
-    private HashMap<String, String> fechaIngreso;
     private HashMap<String, String> fechaSalida;
     private HashMap<String, Boolean> peligrosidad;
     private int numeroManifiesto;
@@ -24,21 +22,16 @@ public class ResiduosPeligrosos extends Bitacora {
               String prestadorServicio, String residuo, String faseManejo, int matriculaUsuario,
               float cantidadGenerada, HashMap<String, String> fechaSalida,
               HashMap<String, Boolean> peligrosidad, int numeroManifiesto, int numeroAutorizacion) {
-        this.idUsuario = idUsuario;
+        super(idUsuario, fechaIngreso);
         this.prestadorServicio = prestadorServicio;
         this.residuo = residuo;
         this.faseManejo = faseManejo;
         this.matriculaUsuario = matriculaUsuario;
         this.cantidadGenerada = cantidadGenerada;
-        this.fechaIngreso = fechaIngreso;
         this.fechaSalida = fechaSalida;
         this.peligrosidad = peligrosidad;
         this.numeroManifiesto = numeroManifiesto;
         this.numeroAutorizacion = numeroAutorizacion;
-    }
-
-    public String getIdUsuario(){
-        return idUsuario;
     }
 
     public String getPrestadorServicio() {
@@ -79,14 +72,6 @@ public class ResiduosPeligrosos extends Bitacora {
 
     public void setCantidadGenerada(float cantidadGenerada) {
         this.cantidadGenerada = cantidadGenerada;
-    }
-
-    public HashMap<String, String> getFechaIngreso() {
-        return fechaIngreso;
-    }
-
-    public void setFechaIngreso(HashMap<String, String> fechaIngreso) {
-        this.fechaIngreso = fechaIngreso;
     }
 
     public HashMap<String, String> getFechaSalida() {

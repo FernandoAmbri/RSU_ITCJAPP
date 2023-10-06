@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.example.rsu_itcjapp.datos.Alumno;
 import com.example.rsu_itcjapp.datos.Aviso;
-import com.example.rsu_itcjapp.datos.DatabaseSGA;
+import com.example.rsu_itcjapp.db.DatabaseSGA;
 import com.example.rsu_itcjapp.datos.Usuario;
 import com.example.rsu_itcjapp.listView.DatosReporte;
 import com.example.rsu_itcjapp.listView.ReportesAdapter;
@@ -34,11 +34,6 @@ import java.util.HashMap;
 
 public class OpcionesMenuCoord extends AppCompatActivity {
 
-    private final int [] opciones = {
-            R.layout.layout_generar_aviso, R.layout.layout_reportes_alumnos_servicio,
-            R.layout.layout_informacion_usuario
-    };
-
     private ReportesAdapter adapterReporteBim;
     private ArrayList<DatosReporte> datosReportesBim;
 
@@ -46,42 +41,34 @@ public class OpcionesMenuCoord extends AppCompatActivity {
     private Usuario docente;
     private Calendar fechaActual;
     private HashMap<String, String> fechaServicio;
-    private SimpleDateFormat smf;
+    private SimpleDateFormat formatoFecha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        docente = (Usuario) getIntent().getExtras().get(Constantes.USUARIO_DOCENTE);
-        int opcionSeleccionada = (Integer) getIntent().getExtras().get(Constantes.OPCION_MENU_ID);
-        setContentView(opciones[opcionSeleccionada]);
+        Bundle bundle = getIntent().getExtras();
+        docente = (Usuario) bundle.get(Constantes.USUARIO_DOCENTE);
+        int layoutSeleccionado = (Integer) bundle.get(Constantes.LAYOUT);
+        setContentView(layoutSeleccionado);
 
-        databaseSGA = new DatabaseSGA();
+        databaseSGA = new DatabaseSGA(OpcionesMenuCoord.this);
         fechaServicio = new HashMap<>();
 
-        smf = new SimpleDateFormat("dd/MM/yyyy");
+        formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
         fechaActual = Calendar.getInstance();
 
-        seleccionarLayout(opcionSeleccionada);
+        seleccionarLayout(layoutSeleccionado);
     }
 
-    @Override
-    public void onStart(){
-        super.onStart();
-        if(databaseSGA.getUser() == null){
-            Intent pantallaInicio = new Intent(OpcionesMenuCoord.this, MainActivity.class);
-            startActivity(pantallaInicio);
-        }
-    }
-
-    private void seleccionarLayout(int opcionSeleccionada){
-        switch(opcionSeleccionada) {
-            case 0:
+    private void seleccionarLayout(int layout){
+        switch(layout) {
+            case Constantes.GENERARAVISO:
                 generarAviso();
                 break;
-            case 1:
+            case Constantes.ALUMNOSSERVICIO:
                 mostrarReporteBimestral();
                 break;
-            case 2:
+            case Constantes.VERPERFIL:
                 mostrarDatosCuenta();
                 break;
         }
@@ -89,21 +76,34 @@ public class OpcionesMenuCoord extends AppCompatActivity {
 
     private void generarAviso() {
         final String path = "aviso/0";
+
         TextInputEditText txtTitulo = (TextInputEditText) findViewById(R.id.tie_titulo_aviso);
         TextInputEditText txtCorreo = (TextInputEditText) findViewById(R.id.tie_correo_aviso);
         TextInputEditText txtInformacion = (TextInputEditText) findViewById(R.id.tie_informacion_aviso);
+
+        Button btnAvisoAnterior = (Button) findViewById(R.id.btn_aviso_anterior);
         Button btnGuardarAviso = (Button) findViewById(R.id.btn_guardar_aviso);
 
-        databaseSGA.getDbRef().child(path).get()
-                .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        btnAvisoAnterior.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(Task<DataSnapshot> task) {
-                Aviso aviso = task.getResult().getValue(Aviso.class);
-                if(aviso != null) {
-                    txtTitulo.setText(aviso.getTitulo());
-                    txtCorreo.setText(aviso.getCorreo());
-                    txtInformacion.setText(aviso.getInfo());
-                }
+            public void onClick(View view) {
+
+                InputMethodManager inputMethodManager =
+                        (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+                databaseSGA.getDbRef().child(path).get()
+                        .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(Task<DataSnapshot> task) {
+                                Aviso aviso = task.getResult().getValue(Aviso.class);
+                                if (aviso != null) {
+                                    txtTitulo.setText(aviso.getTitulo());
+                                    txtCorreo.setText(aviso.getCorreo());
+                                    txtInformacion.setText(aviso.getInfo());
+                                }
+                            }
+                        });
             }
         });
 
@@ -114,9 +114,18 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                 String correo = txtCorreo.getText().toString().trim();
                 String info = txtInformacion.getText().toString().trim();
 
-                if (tituloAviso.isEmpty() || correo.isEmpty() || info.isEmpty()) {
-                    Toast.makeText(OpcionesMenuCoord.this, "Campos vacíos",
-                            Toast.LENGTH_SHORT).show();
+                if (tituloAviso.isEmpty()) {
+                   txtTitulo.setError("Campo vacío");
+                   return;
+                }
+
+                if(correo.isEmpty()) {
+                    txtCorreo.setError("Campo vacío");
+                    return;
+                }
+
+                if (info.isEmpty()) {
+                    txtInformacion.setError("Campo vacío");
                     return;
                 }
 
@@ -125,6 +134,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
                 Aviso aviso = new Aviso(correo, info, tituloAviso);
+
                 databaseSGA.getDbRef().child(path).setValue(aviso)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -142,34 +152,37 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
+
+                txtCorreo.setText("");
+                txtInformacion.setText("");
+                txtTitulo.setText("");
             }
         });
     }
 
     private int calcularReporte(HashMap<String, String> fechaServicio) {
-        final String fechaServicioAlum = fechaServicio.get("dia")+"/"+fechaServicio.get("mes")
-                +"/"+fechaServicio.get("anho");
         int rep = 0;
-
-        Calendar fechaServicioInicio = Calendar.getInstance();
-
         try {
-            Date dateServicio = smf.parse(fechaServicioAlum);
+            final String fechaServicioAlum = fechaServicio.get("dia")+"/"+fechaServicio.get("mes")
+                    +"/"+fechaServicio.get("anho");
+
+            Calendar fechaServicioInicio = Calendar.getInstance();
+
+            Date dateServicio = formatoFecha.parse(fechaServicioAlum);
             fechaServicioInicio.setTime(dateServicio);
 
             int anhos = fechaActual.get(Calendar.YEAR) - fechaServicioInicio.get(Calendar.YEAR);
             int dias = fechaActual.get(Calendar.DAY_OF_YEAR) - fechaServicioInicio.get(Calendar.DAY_OF_YEAR);
 
-            if(anhos > 0 || dias > 240) return rep;
+            if (anhos > 0 || dias > 240) return rep;
 
             if (dias >= 180) rep = 3;
             else if (dias >= 120) rep = 2;
             else if (dias >= 60) rep = 1;
 
-        } catch(Exception ex) {
-            System.out.println(ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("Error en método calcularReporte= "+ex.getMessage());
         }
-
         return rep;
     }
 
@@ -195,19 +208,21 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                         Alumno alumno = dataSnapshot.getValue(Alumno.class);
                         fechaServicio = alumno.getResidenciasInicio();
 
-                        int rep = calcularReporte(fechaServicio);
+                        if (fechaServicio != null) {
 
-                        if(rep > 0) {
-                            String nombreCompleto = alumno.getNombre() + " " +
-                                    alumno.getApellidoPaterno() + " " + alumno.getApellidoMaterno();
+                            int rep = calcularReporte(fechaServicio);
 
-                            DatosReporte datosReporte = new DatosReporte(nombreCompleto,
-                                    String.valueOf(alumno.getMatricula()), alumno.getArea(),
-                                    reporte + rep);
+                            if (rep > 0) {
+                                String nombreCompleto = alumno.getNombre() + " " +
+                                        alumno.getApellidoPaterno() + " " + alumno.getApellidoMaterno();
 
-                            datosReportesBim.add(datosReporte);
+                                DatosReporte datosReporte = new DatosReporte(nombreCompleto,
+                                        String.valueOf(alumno.getMatricula()), alumno.getArea(),
+                                        reporte + rep);
+
+                                datosReportesBim.add(datosReporte);
+                            }
                         }
-
                     }
                     adapterReporteBim.notifyDataSetChanged();
                 }
@@ -254,6 +269,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                        "Sesión finalizada.", Toast.LENGTH_SHORT).show();
                Intent pantallaInicio = new Intent(OpcionesMenuCoord.this, MainActivity.class);
                startActivity(pantallaInicio);
+               finish();
            }
         });
     }

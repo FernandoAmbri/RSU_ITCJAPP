@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import com.example.rsu_itcjapp.datos.DatabaseSGA;
+import com.example.rsu_itcjapp.db.DatabaseSGA;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        databaseSGA = new DatabaseSGA();
+        databaseSGA = new DatabaseSGA(MainActivity.this);
 
         btnAlumno = (Button) findViewById(R.id.btn_alumno);
         btnCoordinador = (Button) findViewById(R.id.btn_coordinador);
@@ -27,18 +27,14 @@ public class MainActivity extends AppCompatActivity {
         btnAlumno.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, LoginUsuarios.class);
-                intent.putExtra(Constantes.USUARIO, Constantes.USUARIO_ALUMNO);
-                startActivity(intent);
+                initLogin(Constantes.USUARIO, Constantes.USUARIO_ALUMNO);
             }
         });
 
         btnCoordinador.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, LoginUsuarios.class);
-                intent.putExtra(Constantes.USUARIO, Constantes.USUARIO_DOCENTE);
-                startActivity(intent);
+                initLogin(Constantes.USUARIO, Constantes.USUARIO_DOCENTE);
             }
         });
 
@@ -47,9 +43,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart(){
         super.onStart();
-        if(databaseSGA.getUser() != null) {
-            databaseSGA.mostrarMenu(MainActivity.this,
-                            Constantes.USUARIO, Constantes.USER_DATA);
+        if (databaseSGA.getUser() != null) {
+            databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
+            finish();
         }
+    }
+
+    public void initLogin(String usuario, String tipoUsuario) {
+        Intent intent = new Intent(MainActivity.this, LoginUsuarios.class);
+        intent.putExtra(usuario, tipoUsuario);
+        startActivity(intent);
+        finish();
     }
 }

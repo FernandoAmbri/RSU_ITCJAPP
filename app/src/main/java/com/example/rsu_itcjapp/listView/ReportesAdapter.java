@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class ReportesAdapter extends ArrayAdapter<DatosReporte> implements View.OnClickListener{
 
-    Context mContext;
+    private Context mContext;
     private ArrayList<DatosReporte> datosReporte;
 
     public ReportesAdapter(Context context, ArrayList<DatosReporte> datos) {

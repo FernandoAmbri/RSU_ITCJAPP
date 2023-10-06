@@ -11,12 +11,13 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.rsu_itcjapp.datos.Alumno;
-import com.example.rsu_itcjapp.datos.DatabaseSGA;
+import com.example.rsu_itcjapp.db.DatabaseSGA;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class RegistroUsuario extends AppCompatActivity {
 
@@ -37,7 +38,7 @@ public class RegistroUsuario extends AppCompatActivity {
 
         usuario = (String) getIntent().getExtras().get(Constantes.USUARIO);
 
-        databaseSGA = new DatabaseSGA();
+        databaseSGA = new DatabaseSGA(RegistroUsuario.this);
         residenciasInicio = new HashMap<>();
         residenciasFin = new HashMap<>();
 
@@ -83,8 +84,60 @@ public class RegistroUsuario extends AppCompatActivity {
         btnRegistroUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String nombre = txtNombre.getText().toString().trim();
+                String apellidoPaterno = txtApellidoPaterno.getText().toString().trim();
+                String apellidoMaterno = txtApellidoMaterno.getText().toString().trim();
+                String area = actAreasTrabajo.getText().toString();
+                String carrera = actCarreras.getText().toString();
+                String matricula = txtMatricula.getText().toString().trim();
+                String correo = txtCorreo.getText().toString().trim();
+                String password = txtPassword.getText().toString().trim();
+                String fechaInicio = txtFechaInicio.getText().toString();
+                String fechaFin = txtFechaFinal.getText().toString();
+
+                String expresion = "^[\\w+_.-]+@[\\w+.-]+$";
+                Pattern pattern = Pattern.compile(expresion, Pattern.CASE_INSENSITIVE);
+
                 ocultarTeclado(view);
-                registrarUsuario();
+
+                if(nombre.isEmpty() || apellidoPaterno.isEmpty() || apellidoMaterno.isEmpty() || area.isEmpty()
+                        || carrera.isEmpty() || correo.isEmpty() || password.isEmpty()){
+                    Toast.makeText(RegistroUsuario.this, "Campos vacios", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (fechaInicio.isEmpty() || fechaFin.isEmpty()) {
+                    Toast.makeText(RegistroUsuario.this, "Falta capturar fecha inicio/fin.",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(matricula.length() < 8) {
+                    txtMatricula.setError("Matricula incorrecta.");
+                    return;
+                }
+
+                if(!pattern.matcher(correo).matches()) {
+                    txtCorreo.setError("Correo no válido.");
+                    return;
+                }
+
+                Alumno alumno = new Alumno(nombre, apellidoPaterno, apellidoMaterno, area, usuario,
+                        carrera, Integer.parseInt(matricula), residenciasInicio, residenciasFin);
+
+                registrarUsuario(alumno, correo, password);
+
+                txtNombre.setText("");
+                txtApellidoPaterno.setText("");
+                txtApellidoMaterno.setText("");
+                actAreasTrabajo.setText("");
+                actCarreras.setText("");
+                txtMatricula.setText("");
+                txtCorreo.setText("");
+                txtPassword.setText("");
+                txtFechaInicio.setText("");
+                txtFechaFinal.setText("");
             }
         });
 
@@ -93,9 +146,9 @@ public class RegistroUsuario extends AppCompatActivity {
     @Override
     public void onStart(){
         super.onStart();
-        if(databaseSGA.getUser() != null){
-            databaseSGA.mostrarMenu(RegistroUsuario.this, Constantes.USUARIO,
-                    Constantes.USER_DATA);
+        if (databaseSGA.getUser() != null) {
+            databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
+            finish();
         }
     }
 
@@ -105,73 +158,24 @@ public class RegistroUsuario extends AppCompatActivity {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    private void registrarUsuario() {
-
-        String nombre = txtNombre.getText().toString().trim();
-        String apellidoPaterno = txtApellidoPaterno.getText().toString().trim();
-        String apellidoMaterno = txtApellidoMaterno.getText().toString().trim();
-        String area = actAreasTrabajo.getText().toString();
-        String carrera = actCarreras.getText().toString();
-        String matricula = txtMatricula.getText().toString().trim();
-        String correo = txtCorreo.getText().toString().trim();
-        String password = txtPassword.getText().toString().trim();
-        String fechaInicio = txtFechaInicio.getText().toString();
-        String fechaFin = txtFechaFinal.getText().toString();
-
-        if(matricula.length() < 8) {
-            Toast.makeText(RegistroUsuario.this,
-                    "La matricula no es correcta.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if(correo.isEmpty() || password.isEmpty()) {
-            Toast.makeText(RegistroUsuario.this, "Campos vacios", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if(nombre.isEmpty() || apellidoPaterno.isEmpty() || apellidoMaterno.isEmpty()
-                || area.isEmpty() || carrera.isEmpty()){
-            Toast.makeText(RegistroUsuario.this, "Campos vacios", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if(fechaInicio.isEmpty() || fechaFin.isEmpty()) {
-            Toast.makeText(RegistroUsuario.this, "Falta capturar fecha inicio/fin.",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-
-        Alumno alumno = new Alumno(nombre, apellidoPaterno, apellidoMaterno, area, usuario,
-                carrera, Integer.parseInt(matricula), residenciasInicio, residenciasFin);
+    private void registrarUsuario(Alumno alumno, String correo, String password) {
 
         databaseSGA.getAuth().createUserWithEmailAndPassword(correo, password).
                 addOnCompleteListener(RegistroUsuario.this,
                 new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(Task<AuthResult> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()){
                             String userId = task.getResult().getUser().getUid();
-                            databaseSGA.registrarCuenta(alumno, userId, RegistroUsuario.this);
-                            databaseSGA.mostrarMenu(RegistroUsuario.this, Constantes.USUARIO,
-                                    Constantes.USER_DATA);
-
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Error al registrar la cuenta.",
-                                    Toast.LENGTH_SHORT).show();
+                            databaseSGA.registrarCuenta(alumno, userId);
+                            databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
+                            finish();
+                            return;
                         }
+                        Toast.makeText(getApplicationContext(), "Error al registrar la cuenta.",
+                                    Toast.LENGTH_SHORT).show();
                     }
                 });
 
-        txtNombre.setText("");
-        txtApellidoPaterno.setText("");
-        txtApellidoMaterno.setText("");
-        actAreasTrabajo.setText("");
-        actCarreras.setText("");
-        txtMatricula.setText("");
-        txtCorreo.setText("");
-        txtPassword.setText("");
-        txtFechaInicio.setText("");
-        txtFechaFinal.setText("");
     }
 }

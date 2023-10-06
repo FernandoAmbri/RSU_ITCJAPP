@@ -1,11 +1,11 @@
 package com.example.rsu_itcjapp.listView;
 
-public class DataList {
+public class DatosListaMenu {
 
     private String name;
     private int iconImage;
 
-    public DataList(String name, int iconImage) {
+    public DatosListaMenu(String name, int iconImage) {
         this.name = name;
         this.iconImage = iconImage;
     }

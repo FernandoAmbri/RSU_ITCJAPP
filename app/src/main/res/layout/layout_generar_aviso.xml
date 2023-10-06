@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:padding="20dp"
     android:background="@color/white"
-    tools:context=".RegistroUsuario">
+    tools:context=".OpcionesMenuCoord">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -85,10 +85,22 @@
 
 
             <Button
+                android:id="@+id/btn_aviso_anterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="80dp"
+                android:padding="15dp"
+                android:textAllCaps="false"
+                android:text="Mostrar aviso anterior"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                app:backgroundTint="@color/white" />
+
+            <Button
                 android:id="@+id/btn_guardar_aviso"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="10dp"
                 android:padding="15dp"
                 android:textAllCaps="false"
                 android:text="Guardar cambios"

@@ -12,8 +12,8 @@ public class MarcadoresPilas extends Bitacora{
     }
 
     public MarcadoresPilas(Usuario usuario, HashMap<String, String> fechaIngreso, int cantidad,
-                           String departamento) {
-        super(usuario, fechaIngreso);
+                           String departamento, String idUsuario) {
+        super(usuario, fechaIngreso, idUsuario);
         this.cantidad = cantidad;
         this.departamento = departamento;
     }

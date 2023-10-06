@@ -2,11 +2,10 @@ package com.example.rsu_itcjapp;
 
 public class Constantes {
 
-    public static final String OPCION_MENU_ID = "opcionId", LAYOUT = "layout";
-
-    public static final String USUARIO = "USUARIO";
+    public static final String LAYOUT = "layout";
+    public static final String USUARIO = "tipoUsuario";
     public static final String USUARIOS = "usuarios";
-    public static final String USER_DATA = "USER_DATA";
+    public static final String DATOS_USUARIO = "datosUsuario";
     public static final String USUARIO_DOCENTE = "docente";
     public static final String USUARIO_ALUMNO = "alumno";
     public static final String USUARIO_TRABAJADOR = "trabajador";
@@ -19,4 +18,12 @@ public class Constantes {
     public static final String AVISO = "Generar aviso";
     public static final String REPORTE_BIMESTRAL = "Alumnos servicio social";
 
+    public static final int RECICLAJE = R.layout.layout_reciclaje;
+    public static final int MARCADORESPILAS = R.layout.layout_marcadores_pilas;
+    public static final int RESIDUOSPELIGROSOS = R.layout.layout_residuos_peligrosos;
+    public static final int SISTEMADERIEGO = R.layout.layout_sistema_riego;
+    public static final int ENVIARCORREO = R.layout.layout_enviar_correo;
+    public static final int VERPERFIL = R.layout.layout_informacion_usuario;
+    public static final int GENERARAVISO = R.layout.layout_generar_aviso;
+    public static final int ALUMNOSSERVICIO = R.layout.layout_reportes_alumnos_servicio;
 }

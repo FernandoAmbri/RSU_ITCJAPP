@@ -2,24 +2,21 @@ package com.example.rsu_itcjapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.rsu_itcjapp.datos.Alumno;
-import com.example.rsu_itcjapp.datos.DatabaseSGA;
+import com.example.rsu_itcjapp.db.DatabaseSGA;
 import com.example.rsu_itcjapp.datos.MarcadoresPilas;
 import com.example.rsu_itcjapp.datos.Reciclaje;
 import com.example.rsu_itcjapp.datos.ResiduosPeligrosos;
@@ -27,8 +24,6 @@ import com.example.rsu_itcjapp.datos.SistemaRiego;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
 public class OpcionesMenuAlumno extends AppCompatActivity {
@@ -36,8 +31,6 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
     private Alumno alumno;
     private String idUsuario = "";
     private Integer codigosPeligrosidad = 0;
-
-    private final ArrayList<Integer> opcionesLayout = new ArrayList<>();
 
     private HashMap<String, String> fechaIngreso;
     private HashMap<String, String> fechaSalida;
@@ -50,68 +43,43 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getIntent().getExtras();
-
-        int opcionSeleccionada = (Integer) bundle.get(Constantes.OPCION_MENU_ID);
-        int primerLayout = (Integer) bundle.get(Constantes.LAYOUT);
+        int layoutRegistro = (Integer) bundle.get(Constantes.LAYOUT);
         alumno = (Alumno) bundle.getSerializable(Constantes.USUARIO_ALUMNO);
 
-        opcionesLayout.add(primerLayout);
-        opcionesLayout.add(R.layout.layout_enviar_correo);
-        opcionesLayout.add(R.layout.layout_informacion_usuario);
+        setContentView(layoutRegistro);
 
-        setContentView(opcionesLayout.get(opcionSeleccionada));
-
-        databaseSGA = new DatabaseSGA();
+        databaseSGA = new DatabaseSGA(OpcionesMenuAlumno.this);
         idUsuario = databaseSGA.getUser().getUid();
 
         fechaIngreso = new HashMap<>();
         fechaSalida = new HashMap<>();
-
         restablecerFechas();
 
         peligrosidad = new HashMap<>();
-
         establecerPeligrosidad();
 
-        seleccionarLayout(opcionSeleccionada, alumno);
+        seleccionarComponentes(layoutRegistro);
     }
 
-    @Override
-    public void onStart(){
-        super.onStart();
-        if(databaseSGA.getUser() == null){
-            Intent pantallaInicio = new Intent(OpcionesMenuAlumno.this, MainActivity.class);
-            startActivity(pantallaInicio);
-        }
-    }
-
-    private void seleccionarLayoutRegistro(Alumno alumno) {
-        switch(alumno.getArea()) {
-            case Constantes.REC:
-                registrarDatosReciclaje(alumno);
-                break;
-            case Constantes.MPT:
-                registrarDatosMarcadoresPilas(alumno);
-                break;
-            case Constantes.STAR:
-                registrarDatosSistemaRiego(alumno);
-                break;
-            default:
-                registrarDatosResiduosPeligrosos(alumno);
-                break;
-        }
-    }
-
-    private void seleccionarLayout(int opcionSeleccionada, Alumno alumno) {
+    private void seleccionarComponentes(int opcionSeleccionada) {
         switch(opcionSeleccionada) {
-            case 0:
-                seleccionarLayoutRegistro(alumno);
+            case Constantes.RECICLAJE:
+                registrarDatosReciclaje();
                 break;
-            case 1:
+            case Constantes.MARCADORESPILAS:
+                registrarDatosMarcadoresPilas();
+                break;
+            case Constantes.RESIDUOSPELIGROSOS:
+                registrarDatosResiduosPeligrosos();
+                break;
+            case Constantes.SISTEMADERIEGO:;
+                registrarDatosSistemaRiego();
+                break;
+            case Constantes.ENVIARCORREO:
                 enviarCorreo();
                 break;
-            case 2:
-                mostrarDatosCuenta(alumno);
+            case Constantes.VERPERFIL:
+                mostrarDatosCuenta();
                 break;
         }
     }
@@ -141,9 +109,60 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         fechaSalida.put("dia", "00");
     }
 
-    private void registrarDatosReciclaje(Alumno alumno) {
-        String nodo = "reciclaje";
-        String path = "contadores/reciclajeContador";
+    public void modificarPeligrosidad(boolean seleccionado, String codigo) {
+        if(seleccionado) {
+            peligrosidad.replace(codigo, true);
+            codigosPeligrosidad += 1;
+            return;
+        }
+        peligrosidad.replace(codigo, false);
+        codigosPeligrosidad -= 1;
+    }
+
+    public void seleccionarCodigoPeligrosidad(View view) {
+        boolean seleccionado = ((CheckBox) view).isChecked();
+
+        final int ckbC = R.id.ckb_C;
+        final int ckbR = R.id.ckb_R;
+        final int ckbE = R.id.ckb_E;
+        final int ckbT = R.id.ckb_T;
+        final int ckbI = R.id.ckb_I;
+        final int ckbB = R.id.ckb_B;
+
+        switch(view.getId()){
+            case ckbC:
+                modificarPeligrosidad(seleccionado, "corrosivo");
+                break;
+            case ckbR:
+                modificarPeligrosidad(seleccionado, "reactivo");
+                break;
+            case ckbE:
+                modificarPeligrosidad(seleccionado, "explosivo");
+                break;
+            case ckbT:
+                modificarPeligrosidad(seleccionado, "toxico");
+                break;
+            case ckbI:
+                modificarPeligrosidad(seleccionado, "inflamable");
+                break;
+            case ckbB:
+                modificarPeligrosidad(seleccionado, "biologicoInfeccioso");
+                break;
+        }
+    }
+
+    private void limpiarcheckBoxes() {
+        ((CheckBox) findViewById(R.id.ckb_C)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_R)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_E)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_T)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_I)).setChecked(false);
+        ((CheckBox) findViewById(R.id.ckb_B)).setChecked(false);
+    }
+
+    private void registrarDatosReciclaje() {
+        final String nodo = "reciclajeBitacora/";
+        final String path = "contadores/reciclajeBitacoraContador";
 
         TextInputEditText txtTapasRec = (TextInputEditText) findViewById(R.id.tie_tapas_rec);
         TextInputEditText txtBotellas = (TextInputEditText) findViewById(R.id.tie_botellas_rec);
@@ -159,7 +178,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
             }
         });
 
-        databaseSGA.verificarNodo(nodo, getApplicationContext());
+        databaseSGA.verificarNodo(path);
 
         btnReciclaje.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,36 +191,35 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
                 int tapas = 0, botellas = 0, botes = 0;
 
-                if(!TextUtils.isEmpty(cantidadTapas)) {
+                if (!TextUtils.isEmpty(cantidadTapas)) {
                     tapas = Integer.parseInt(cantidadTapas);
                 }
 
-                if(!TextUtils.isEmpty(cantidadBotellas)) {
+                if (!TextUtils.isEmpty(cantidadBotellas)) {
                     botellas = Integer.parseInt(cantidadBotellas);
                 }
 
-                if(!TextUtils.isEmpty(botesAluminio)) {
+                if (!TextUtils.isEmpty(botesAluminio)) {
                     botes = Integer.parseInt(botesAluminio);
                 }
 
-                if(tapas < 1 && botellas < 1 && botes < 1) {
+                if (tapas < 1 && botellas < 1 && botes < 1) {
                     Toast.makeText(OpcionesMenuAlumno.this,
                             "Es necesario introducir una cantidad.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if(fecha.isEmpty()) {
-                    Toast.makeText(OpcionesMenuAlumno.this,
-                            "Falta introducir la fecha.", Toast.LENGTH_SHORT).show();
+                    txtFecha.setError("Campo vacío");
                     return;
                 }
 
                 ocultarTeclado(view);
-
-                Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
+                Alumno alum = new Alumno (alumno.getNombre(), alumno.getApellidoPaterno(),
                                                 alumno.getApellidoMaterno(), alumno.getMatricula());
-                Reciclaje reciclaje = new Reciclaje(alum, fechaIngreso, tapas, botellas, botes);
-                databaseSGA.registrarDatosBitacora(path, nodo, reciclaje, getApplicationContext());
+
+                Reciclaje reciclaje = new Reciclaje (alum, fechaIngreso, tapas, botellas, botes, idUsuario);
+                databaseSGA.registrarDatosBitacora(path, nodo, reciclaje);
 
                 txtTapasRec.setText("");
                 txtBotellas.setText("");
@@ -212,7 +230,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
     }
 
-    private void registrarDatosMarcadoresPilas(Alumno alumno) {
+    private void registrarDatosMarcadoresPilas() {
 
         AutoCompleteTextView actCategoria = (AutoCompleteTextView) findViewById(R.id.act_categoria_mpt);
         TextInputEditText txtCantidad = (TextInputEditText) findViewById(R.id.tie_cantidad_mpt);
@@ -233,9 +251,9 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         actDepartamento.setAdapter(adapterDepartamento);
         actCategoria.setAdapter(adapterCategorias);
 
-        databaseSGA.verificarNodo("marcadores", getApplicationContext());
-        databaseSGA.verificarNodo("pilas", getApplicationContext());
-        databaseSGA.verificarNodo("toners", getApplicationContext());
+        databaseSGA.verificarNodo("contadores/marcadoresBitacoraContador");
+        databaseSGA.verificarNodo("contadores/pilasBitacoraContador");
+        databaseSGA.verificarNodo("contadores/tonersBitacoraContador");
 
         txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -253,7 +271,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                String cantidad = txtCantidad.getText().toString().trim();
                String departamento = actDepartamento.getText().toString();
                String fecha = txtFecha.getText().toString();
-               String path = "contadores"+"/"+categoriaMpt+"Contador";
+               String path = "contadores/"+categoriaMpt+"BitacoraContador";
 
                if(categoriaMpt.isEmpty() || cantidad.isEmpty() || departamento.isEmpty()) {
                    Toast.makeText(OpcionesMenuAlumno.this, "Campo vacío.",
@@ -264,14 +282,12 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                int cantidadMpt = Integer.parseInt(cantidad);
 
                if(cantidadMpt < 1) {
-                   Toast.makeText(OpcionesMenuAlumno.this, "Cantidad no valida.",
-                           Toast.LENGTH_SHORT).show();
+                   txtCantidad.setError("Cantidad no válida");
                    return;
                }
 
                if(fecha.isEmpty()) {
-                   Toast.makeText(OpcionesMenuAlumno.this, "Falta introducir la fecha.",
-                           Toast.LENGTH_SHORT).show();
+                   txtFecha.setError("Campo vacío");
                    return;
                }
 
@@ -279,8 +295,9 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
                Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
                                                 alumno.getApellidoMaterno(), alumno.getMatricula());
-               MarcadoresPilas marcadoresPilas = new MarcadoresPilas(alum, fechaIngreso, cantidadMpt, departamento);
-               databaseSGA.registrarDatosBitacora(path, categoriaMpt, marcadoresPilas, getApplicationContext());
+               MarcadoresPilas marcadoresPilas =
+                       new MarcadoresPilas(alum, fechaIngreso, cantidadMpt, departamento, idUsuario);
+               databaseSGA.registrarDatosBitacora(path, categoriaMpt+"Bitacora/", marcadoresPilas);
 
                txtCantidad.setText("");
                actDepartamento.setText("");
@@ -291,54 +308,9 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
     }
 
-    public void modificarPeligrosidad(boolean seleccionado, String codigo) {
-        if(seleccionado) {
-            peligrosidad.replace(codigo, true);
-            codigosPeligrosidad += 1;
-            return;
-        }
-        peligrosidad.replace(codigo, false);
-        codigosPeligrosidad -= 1;
-    }
-
-    public void seleccionarCodigoPeligrosidad(View view) {
-        boolean seleccionado = ((CheckBox) view).isChecked();
-        final int ckbC = R.id.ckb_C;
-
-        switch(view.getId()){
-            case ckbC:
-                modificarPeligrosidad(seleccionado, "corrosivo");
-                break;
-            case R.id.ckb_R:
-                modificarPeligrosidad(seleccionado, "reactivo");
-                break;
-            case R.id.ckb_E:
-                modificarPeligrosidad(seleccionado, "explosivo");
-                break;
-            case R.id.ckb_T:
-                modificarPeligrosidad(seleccionado, "toxico");
-                break;
-            case R.id.ckb_I:
-                modificarPeligrosidad(seleccionado, "inflamable");
-                break;
-            case R.id.ckb_B:
-                modificarPeligrosidad(seleccionado, "biologicoInfeccioso");
-                break;
-        }
-    }
-
-    private void limpiarcheckBoxes() {
-        ((CheckBox) findViewById(R.id.ckb_C)).setChecked(false);
-        ((CheckBox) findViewById(R.id.ckb_R)).setChecked(false);
-        ((CheckBox) findViewById(R.id.ckb_E)).setChecked(false);
-        ((CheckBox) findViewById(R.id.ckb_T)).setChecked(false);
-        ((CheckBox) findViewById(R.id.ckb_I)).setChecked(false);
-        ((CheckBox) findViewById(R.id.ckb_B)).setChecked(false);
-    }
-
-    private void registrarDatosResiduosPeligrosos(Alumno alumno) {
-        String nodo = "rsp";
-        String path = "rspContador/rspBitacoraContador";
+    private void registrarDatosResiduosPeligrosos() {
+        final String nodo = "rspBitacora/";
+        final String path = "rspContador/rspBitacoraContador";
 
         TextInputLayout tilFaseManejo = (TextInputLayout) findViewById(R.id.til_fase_manejo);
         TextInputLayout tilPrestadorServicio = (TextInputLayout) findViewById(R.id.til_prestador_servicio);
@@ -366,6 +338,8 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         tilPrestadorServicio.setVisibility(View.GONE);
         tilNumAuto.setVisibility(View.GONE);
 
+        databaseSGA.verificarNodo(path);
+
         actResiduo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -392,13 +366,13 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         btnSeccionManejo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(tilFaseManejo.getVisibility() == View.GONE) {
+                if (tilFaseManejo.getVisibility() == View.GONE) {
 
                     tilFaseManejo.setVisibility(View.VISIBLE);
                     tilPrestadorServicio.setVisibility(View.VISIBLE);
                     tilNumAuto.setVisibility(View.VISIBLE);
 
-                } else if(tilFaseManejo.getVisibility() == View.VISIBLE) {
+                } else if (tilFaseManejo.getVisibility() == View.VISIBLE) {
 
                     tilFaseManejo.setVisibility(View.GONE);
                     tilPrestadorServicio.setVisibility(View.GONE);
@@ -433,15 +407,13 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                     numAutorizacion = Integer.parseInt(numeroAutorizacion);
                 }
 
-                if(TextUtils.isEmpty(nombreResiduo) ) {
-                    Toast.makeText(OpcionesMenuAlumno.this, "Falta seleccionar residuo.",
-                            Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(nombreResiduo)) {
+                    actResiduo.setError("Falta seleccionar error");
                     return;
                 }
 
                 if(residuoKg < 1) {
-                    Toast.makeText(OpcionesMenuAlumno.this, "Falta cantidad residuo.",
-                            Toast.LENGTH_SHORT).show();
+                    txtCantidadResiduo.setError("Cantidad no válida");
                     return;
                 }
 
@@ -458,7 +430,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                                 faseManejo, alumno.getMatricula(), residuoKg, fechaSalida, peligrosidad,
                                 numManifiesto, numAutorizacion);
 
-                databaseSGA.registrarDatosBitacora(path, nodo, residuosPeligrosos, getApplicationContext());
+                databaseSGA.registrarDatosBitacora(path, nodo, residuosPeligrosos);
 
                 actResiduo.setText("");
                 txtCantidadResiduo.setText("");
@@ -473,9 +445,9 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         });
     }
 
-    private void registrarDatosSistemaRiego(Alumno alumno) {
-        String nodo = "sistemaRiego";
-        String path = "contadores/sistemaRiegoContador";
+    private void registrarDatosSistemaRiego() {
+        final String nodo = "sistemaRiegoBitacora/";
+        final String path = "contadores/sistemaRiegoBitacoraContador";
 
         TextInputEditText txtArea = (TextInputEditText) findViewById(R.id.tie_area_riego);
         AutoCompleteTextView actTipo = (AutoCompleteTextView) findViewById(R.id.act_tipo_riego);
@@ -497,7 +469,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 new ArrayAdapter<>(this, R.layout.dropdown_menu, turnos);
         actTurno.setAdapter(turnosRiegoAdapter);
 
-        databaseSGA.verificarNodo(nodo, getApplicationContext());
+        databaseSGA.verificarNodo(path);
 
         txtFechaRiego.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -510,22 +482,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         txtHoraInicio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Calendar time = Calendar.getInstance();
-                int hour = time.get(Calendar.HOUR_OF_DAY);
-                int minute = time.get(Calendar.MINUTE);
-
-                TimePickerDialog timePickerDialog = new TimePickerDialog(OpcionesMenuAlumno.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int h, int m) {
-                                String time = h+":"+m;
-
-                                if(m < 10) time = h+":0"+m;
-
-                                txtHoraInicio.setText(time);
-                            }
-                        }, hour, minute, DateFormat.is24HourFormat(OpcionesMenuAlumno.this));
-                timePickerDialog.show();
+                Interfaz.setTimePicker(txtHoraInicio, OpcionesMenuAlumno.this);
             }
         });
 
@@ -541,34 +498,31 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 String duracion = txtDuracion.getText().toString().trim();
                 String observaciones = txtObservaciones.getText().toString().trim();
 
-
-                if(TextUtils.isEmpty(area) || TextUtils.isEmpty(tipoRiego) || TextUtils.isEmpty(turno)
+                if (TextUtils.isEmpty(area) || TextUtils.isEmpty(tipoRiego) || TextUtils.isEmpty(turno)
                         || TextUtils.isEmpty(horaRiego) || TextUtils.isEmpty(duracion)) {
                             Toast.makeText(OpcionesMenuAlumno.this, "Campo vacio.",
                                 Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(fechaRiego.isEmpty()) {
-                    Toast.makeText(OpcionesMenuAlumno.this,
-                            "Falta introducir la fecha.", Toast.LENGTH_SHORT).show();
+                if (fechaRiego.isEmpty()) {
+                    txtFechaRiego.setError("Campo vacío");
                     return;
                 }
 
                 int duracionRiego = Integer.parseInt(duracion);
 
-                if(duracionRiego < 1) {
-                    Toast.makeText(OpcionesMenuAlumno.this,
-                            "El valor de duración no es correcto.", Toast.LENGTH_SHORT).show();
+                if (duracionRiego < 1) {
+                    txtDuracion.setError("Cantidad no válida");
                     return;
                 }
 
                 ocultarTeclado(view);
                 Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
                                                 alumno.getApellidoMaterno(), alumno.getMatricula());
-                SistemaRiego sistemaRiego = new SistemaRiego(alum, fechaIngreso, area, tipoRiego, turno,
-                                                        horaRiego, duracionRiego, observaciones);
-                databaseSGA.registrarDatosBitacora(path, nodo, sistemaRiego, getApplicationContext());
+                SistemaRiego sistemaRiego = new SistemaRiego(alum, fechaIngreso, area, tipoRiego,
+                                            turno, horaRiego, duracionRiego, observaciones, idUsuario);
+                databaseSGA.registrarDatosBitacora(path, nodo, sistemaRiego);
 
                 txtArea.setText("");
                 actTipo.setText("");
@@ -598,9 +552,18 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 String asunto = txtAsunto.getText().toString();
                 String mensaje = txtMensaje.getText().toString();
 
-                if(destinatario.isEmpty() || asunto.isEmpty() || mensaje.isEmpty()) {
-                    Toast.makeText(OpcionesMenuAlumno.this,
-                            "Campos vacíos.", Toast.LENGTH_SHORT).show();
+                if (destinatario.isEmpty()) {
+                    txtDestinatario.setError("Falta destinatario.");
+                    return;
+                }
+
+                if (asunto.isEmpty()) {
+                    txtAsunto.setError("Falta introducir asunto.");
+                    return;
+                }
+
+                if (mensaje.isEmpty()) {
+                    txtMensaje.setError("Mensaje vacío.");
                     return;
                 }
 
@@ -624,7 +587,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         });
     }
 
-    private void mostrarDatosCuenta(Alumno alumno) {
+    private void mostrarDatosCuenta() {
 
         TextInputEditText txtNombreUsuario = (TextInputEditText) findViewById(R.id.txt_nombre_inf);
         TextInputEditText txtApellidoPaterno = (TextInputEditText) findViewById(R.id.txt_apellidoPaterno_inf);
@@ -659,13 +622,13 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 databaseSGA.getAuth().signOut();
-                if(databaseSGA.getAuth() == null) {
-                    Toast.makeText(OpcionesMenuAlumno.this,
+
+                Toast.makeText(OpcionesMenuAlumno.this,
                             "Sesión finalizada.", Toast.LENGTH_SHORT).show();
-                    Intent pantallaInicio = new Intent(OpcionesMenuAlumno.this,
+                Intent pantallaInicio = new Intent(OpcionesMenuAlumno.this,
                             MainActivity.class);
-                    startActivity(pantallaInicio);
-                }
+                startActivity(pantallaInicio);
+                finish();
             }
         });
 

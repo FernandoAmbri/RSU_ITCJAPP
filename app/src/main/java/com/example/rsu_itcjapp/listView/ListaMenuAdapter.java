@@ -12,12 +12,12 @@ import com.example.rsu_itcjapp.R;
 
 import java.util.ArrayList;
 
-public class ListAdapter extends ArrayAdapter<DataList> implements View.OnClickListener{
+public class ListaMenuAdapter extends ArrayAdapter<DatosListaMenu> implements View.OnClickListener {
 
-    private ArrayList<DataList> rowItems;
-    Context context;
+    private ArrayList<DatosListaMenu> rowItems;
+    private Context context;
 
-    public ListAdapter(Context context, ArrayList<DataList> datos){
+    public ListaMenuAdapter(Context context, ArrayList<DatosListaMenu> datos){
         super(context, R.layout.row_item, datos);
         this.rowItems = datos;
         this.context = context;
@@ -25,9 +25,7 @@ public class ListAdapter extends ArrayAdapter<DataList> implements View.OnClickL
 
     @Override
     public void onClick(View view) {
-        int posicion = (Integer) view.getTag();
-        Object obj = getItem(posicion);
-        DataList itemDesc = (DataList) obj;
+
     }
 
     private static class ViewHolder {
@@ -37,10 +35,10 @@ public class ListAdapter extends ArrayAdapter<DataList> implements View.OnClickL
 
     @Override
     public View getView(int posicion, View view, ViewGroup parent){
-        DataList item = getItem(posicion);
+        DatosListaMenu item = getItem(posicion);
         ViewHolder viewHolder;
 
-        if(view == null){
+        if (view == null) {
             viewHolder = new ViewHolder();
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
             view = layoutInflater.inflate(R.layout.row_item, parent, false);

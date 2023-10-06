@@ -15,9 +15,9 @@ public class SistemaRiego extends Bitacora {
 
     }
 
-    public SistemaRiego(Usuario usuario, HashMap<String, String> fechaRiego, String area,
-                        String tipoRiego, String turno, String hora, int duracionMin, String observaciones) {
-        super(usuario, fechaRiego);
+    public SistemaRiego(Usuario usuario, HashMap<String, String> fechaRiego, String area, String tipoRiego,
+                String turno, String hora, int duracionMin, String observaciones, String idUsuario) {
+        super(usuario, fechaRiego, idUsuario);
         this.areaRiego = area;
         this.tipoRiego = tipoRiego;
         this.turno = turno;

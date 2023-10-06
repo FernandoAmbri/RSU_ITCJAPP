@@ -1,4 +1,4 @@
-package com.example.rsu_itcjapp.datos;
+package com.example.rsu_itcjapp.db;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,9 @@ import android.widget.Toast;
 
 import com.example.rsu_itcjapp.Constantes;
 import com.example.rsu_itcjapp.MenuUsuarios;
+import com.example.rsu_itcjapp.datos.Alumno;
+import com.example.rsu_itcjapp.datos.Bitacora;
+import com.example.rsu_itcjapp.datos.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -24,12 +27,14 @@ public class DatabaseSGA {
     private FirebaseUser user;
     private FirebaseDatabase db;
     private DatabaseReference dbRef;
+    private Context context;
 
-    public DatabaseSGA() {
-        auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
-        db = FirebaseDatabase.getInstance();
-        dbRef = db.getReference();
+    public DatabaseSGA(Context context) {
+        this.auth = FirebaseAuth.getInstance();
+        this.user = auth.getCurrentUser();
+        this.db = FirebaseDatabase.getInstance();
+        this.dbRef = db.getReference();
+        this.context = context;
     }
 
     public FirebaseAuth getAuth() {
@@ -40,16 +45,11 @@ public class DatabaseSGA {
         return user;
     }
 
-    public FirebaseDatabase getDb() {
-        return db;
-    }
-
     public DatabaseReference getDbRef() {
         return dbRef;
     }
 
-    public void mostrarMenu(Context activityInicio, String usuario, String userData) {
-
+    public void obtenerUsuario(String usuario, String datosUsuario) {
         final String userId = auth.getUid();
         if (userId == null) return;
 
@@ -59,28 +59,30 @@ public class DatabaseSGA {
                     @Override
                     public void onDataChange(DataSnapshot snapshot) {
                         Usuario user = snapshot.getValue(Usuario.class);
+                        if (user == null) return;
+
                         String tipo = user.getTipo();
-                        Intent menu = new Intent(activityInicio, MenuUsuarios.class);
+
+                        Intent menu = new Intent(context, MenuUsuarios.class);
                         menu.putExtra(usuario, tipo);
 
                         if (tipo.equals(Constantes.USUARIO_ALUMNO)) {
-                            menu.putExtra(userData, snapshot.getValue(Alumno.class));
+                            menu.putExtra(datosUsuario, snapshot.getValue(Alumno.class));
                         } else {
-                            menu.putExtra(userData, user);
+                            menu.putExtra(datosUsuario, user);
                         }
-                        activityInicio.startActivity(menu);
-                        Toast.makeText(activityInicio, "Hola, " + user.getNombre()
+                        context.startActivity(menu);
+                        Toast.makeText(context, "Hola, " + user.getNombre()
                                 + " " + user.getApellidoPaterno(), Toast.LENGTH_SHORT).show();
-
                     }
                     @Override
                     public void onCancelled(DatabaseError error) {
-                        Toast.makeText(activityInicio, error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    public void registrarCuenta(Usuario usuario, String userId, Context context) {
+    public void registrarCuenta(Usuario usuario, String userId) {
         dbRef.child(Constantes.USUARIOS)
              .child(userId)
              .setValue(usuario)
@@ -99,9 +101,7 @@ public class DatabaseSGA {
         });
     }
 
-    public void verificarNodo(String nodo, Context context) {
-
-        String path = "contadores"+"/"+nodo+"Contador";
+    public void verificarNodo(String path) {
 
         dbRef.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -110,7 +110,6 @@ public class DatabaseSGA {
                     dbRef.child(path).setValue(0);
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError error) {
                 Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
@@ -118,17 +117,16 @@ public class DatabaseSGA {
         });
     }
 
-    public void registrarDatosBitacora(String path, String nodo, Bitacora datos, Context context){
-
+    public void registrarDatosBitacora(String path, String nodo, Bitacora datos){
         dbRef.child(path)
              .get()
              .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(Task<DataSnapshot> task) {
-                    if(task.isSuccessful()) {
+                    if (task.isSuccessful()) {
                         Integer contador = task.getResult().getValue(Integer.class);
-                        HashMap<String, Object> updates = new HashMap<>();
-                        updates.put(nodo+"Bitacora"+"/"+contador, datos);
+                        HashMap <String, Object> updates = new HashMap<>();
+                        updates.put(nodo+contador, datos);
                         updates.put(path, contador + 1);
 
                         dbRef.updateChildren(updates)
@@ -138,7 +136,13 @@ public class DatabaseSGA {
                                     Toast.makeText(context, "Registro guardado correctamente.",
                                             Toast.LENGTH_SHORT).show();
                                 }
-                        });
+                            })
+                             .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
                     }
                 }
            }).addOnFailureListener(new OnFailureListener() {
@@ -147,7 +151,5 @@ public class DatabaseSGA {
                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
            });
-
     }
-
 }

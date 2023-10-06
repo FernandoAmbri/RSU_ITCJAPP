@@ -9,26 +9,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.rsu_itcjapp.datos.Alumno;
-import com.example.rsu_itcjapp.datos.DatabaseSGA;
 import com.example.rsu_itcjapp.datos.Usuario;
-import com.example.rsu_itcjapp.listView.DataList;
-import com.example.rsu_itcjapp.listView.ListAdapter;
+import com.example.rsu_itcjapp.listView.DatosListaMenu;
+import com.example.rsu_itcjapp.listView.ListaMenuAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MenuUsuarios extends AppCompatActivity {
 
-    private ArrayList<DataList> coordinadorAdapter;
-    private ListAdapter listAdapterCoordinador;
-
-    private ArrayList<DataList> alumnoAdapter;
-    private ListAdapter listAdapterAlumno;
-
-    private ListView listView;
-
-    private HashMap<String, Integer> layouts;
-    private DatabaseSGA databaseSGA;
     private Usuario usuario;
     private Alumno alumno;
 
@@ -36,89 +25,109 @@ public class MenuUsuarios extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_usuario);
-
-        databaseSGA = new DatabaseSGA();
+        ListView listView = (ListView) findViewById(R.id.list_view);
 
         Bundle bundle = getIntent().getExtras();
         String usuarioSeleccionado = (String) bundle.get(Constantes.USUARIO);
-        usuario = (Usuario) bundle.getSerializable(Constantes.USER_DATA);
-        listView = (ListView) findViewById(R.id.list_view);
 
         if (usuarioSeleccionado.equals(Constantes.USUARIO_ALUMNO)) {
-            alumno = (Alumno) bundle.getSerializable(Constantes.USER_DATA);
-            crearMenuAlumno(listView);
+            alumno = (Alumno) bundle.getSerializable(Constantes.DATOS_USUARIO);
+            crearOpcionesAlumno(listView);
         } else if (usuarioSeleccionado.equals(Constantes.USUARIO_DOCENTE)) {
-            crearMenuCoordinador(listView);
+            usuario = (Usuario) bundle.getSerializable(Constantes.DATOS_USUARIO);
+            crearOpcionesCoordinador(listView);
         }
     }
 
     @Override
     public void onStart(){
         super.onStart();
-        if(databaseSGA.getUser() == null) {
-            Intent pantallaInicio = new Intent(MenuUsuarios.this, MainActivity.class);
-            startActivity(pantallaInicio);
+        if(alumno == null && usuario == null) {
+            Intent pantallaPrincipal = new Intent(MenuUsuarios.this, MainActivity.class);
+            startActivity(pantallaPrincipal);
+            finish();
         }
     }
 
 
-    public void crearMenuAlumno(ListView listAlumno) {
-        layouts = new HashMap<>();
-        alumnoAdapter = new ArrayList<>();
+    public void crearOpcionesAlumno(ListView listAlumno) {
+        ArrayList<DatosListaMenu> alumnoAdapter = new ArrayList<>();
+        HashMap<String, Integer> layouts = new HashMap<>();
 
-        layouts.put(Constantes.REC, R.layout.layout_reciclaje);
-        layouts.put(Constantes.MPT, R.layout.layout_marcadores_pilas);
-        layouts.put(Constantes.RSP, R.layout.layout_residuos_peligrosos);
-        layouts.put(Constantes.STAR, R.layout.layout_sistema_riego);
+        layouts.put(Constantes.REC, Constantes.RECICLAJE);
+        layouts.put(Constantes.MPT, Constantes.MARCADORESPILAS);
+        layouts.put(Constantes.RSP, Constantes.RESIDUOSPELIGROSOS);
+        layouts.put(Constantes.STAR, Constantes.SISTEMADERIEGO);
 
-        alumnoAdapter.add(new DataList(alumno.getArea(), R.drawable.ic_baseline_assignment_24));
-        alumnoAdapter.add(new DataList(Constantes.EMAIL, R.drawable.ic_baseline_email_24));
-        alumnoAdapter.add(new DataList(Constantes.PERFIL, R.drawable.ic_baseline_account_circle_24));
+        alumnoAdapter.add(new DatosListaMenu(alumno.getArea(), R.drawable.ic_baseline_assignment_24));
+        alumnoAdapter.add(new DatosListaMenu(Constantes.EMAIL, R.drawable.ic_baseline_email_24));
+        alumnoAdapter.add(new DatosListaMenu(Constantes.PERFIL, R.drawable.ic_baseline_account_circle_24));
 
-        listAdapterAlumno = new ListAdapter(this, alumnoAdapter);
+        ListaMenuAdapter listaMenuAdapterAlumno = new ListaMenuAdapter(this, alumnoAdapter);
 
         AdapterView.OnItemClickListener itemClickListenerAlumno = new AdapterView.OnItemClickListener(){
-
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int posicion, long id) {
-                Integer layout = layouts.get(alumno.getArea());
-
-                if(layout == null) {
-                    layout = R.layout.layout_residuos_peligrosos;
+                Integer layout = null;
+                switch((int) id){
+                    case 0:
+                        layout = layouts.get(alumno.getArea());
+                        break;
+                    case 1:
+                        layout = Constantes.ENVIARCORREO;
+                        break;
+                    case 2:
+                        layout = Constantes.VERPERFIL;
+                        break;
                 }
-
-                Intent opcionMenu = new Intent(getApplicationContext(), OpcionesMenuAlumno.class);
-                opcionMenu.putExtra(Constantes.LAYOUT, layout);
-                opcionMenu.putExtra(Constantes.OPCION_MENU_ID, (int) id);
-                opcionMenu.putExtra(Constantes.USUARIO_ALUMNO, alumno);
-                startActivity(opcionMenu);
+                if (layout == null) {
+                    layout = Constantes.RESIDUOSPELIGROSOS;
+                }
+                Intent opcionesMenu = new Intent(MenuUsuarios.this, OpcionesMenuAlumno.class);
+                opcionesMenu.putExtra(Constantes.LAYOUT, layout);
+                opcionesMenu.putExtra(Constantes.USUARIO_ALUMNO, alumno);
+                startActivity(opcionesMenu);
             }
         };
 
-        listAlumno.setAdapter(listAdapterAlumno);
+        listAlumno.setAdapter(listaMenuAdapterAlumno);
         listAlumno.setOnItemClickListener(itemClickListenerAlumno);
     }
 
-    public void crearMenuCoordinador(ListView listCoordinador) {
-        coordinadorAdapter = new ArrayList<>();
+    public void crearOpcionesCoordinador(ListView listCoordinador) {
+        ArrayList<DatosListaMenu> coordinadorAdapter = new ArrayList<>();
 
-        coordinadorAdapter.add(new DataList(Constantes.AVISO, R.drawable.ic_baseline_assignment_24));
-        coordinadorAdapter.add(new DataList(Constantes.REPORTE_BIMESTRAL, R.drawable.ic_baseline_assignment_24));
-        coordinadorAdapter.add(new DataList(Constantes.PERFIL, R.drawable.ic_baseline_account_circle_24));
+        coordinadorAdapter.add(new DatosListaMenu(Constantes.AVISO, R.drawable.ic_baseline_assignment_24));
+        coordinadorAdapter.add(new DatosListaMenu(Constantes.REPORTE_BIMESTRAL, R.drawable.ic_baseline_assignment_24));
+        coordinadorAdapter.add(new DatosListaMenu(Constantes.PERFIL, R.drawable.ic_baseline_account_circle_24));
 
-        listAdapterCoordinador = new ListAdapter(this, coordinadorAdapter);
+        ListaMenuAdapter listaMenuAdapterCoordinador = new ListaMenuAdapter(this, coordinadorAdapter);
 
         AdapterView.OnItemClickListener itemClickListenerCoord = new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int posicion, long id){
-                Intent opcionMenuCoord = new Intent(getApplicationContext(), OpcionesMenuCoord.class);
-                opcionMenuCoord.putExtra(Constantes.OPCION_MENU_ID, (int) id);
-                opcionMenuCoord.putExtra(Constantes.USUARIO_DOCENTE, usuario);
-                startActivity(opcionMenuCoord);
+            public void onItemClick(AdapterView<?> adapterView, View view, int posicion, long id) {
+                Integer layout = null;
+
+                switch((int) id) {
+                    case 0:
+                        layout = Constantes.GENERARAVISO;
+                        break;
+                    case 1:
+                        layout = Constantes.ALUMNOSSERVICIO;
+                        break;
+                    case 2:
+                        layout = Constantes.VERPERFIL;
+                        break;
+                }
+
+                Intent opcionesMenuCoord = new Intent(MenuUsuarios.this, OpcionesMenuCoord.class);
+                opcionesMenuCoord.putExtra(Constantes.LAYOUT, layout);
+                opcionesMenuCoord.putExtra(Constantes.USUARIO_DOCENTE, usuario);
+                startActivity(opcionesMenuCoord);
             }
         };
 
-        listCoordinador.setAdapter(listAdapterCoordinador);
+        listCoordinador.setAdapter(listaMenuAdapterCoordinador);
         listCoordinador.setOnItemClickListener(itemClickListenerCoord);
     }
 }
