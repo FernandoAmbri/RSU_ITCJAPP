@@ -7,7 +7,6 @@ public class ResiduosPeligrosos extends Bitacora {
     private String prestadorServicio;
     private String residuo;
     private String faseManejo;
-    private int matriculaUsuario;
     private float cantidadGenerada;
     private HashMap<String, String> fechaSalida;
     private HashMap<String, Boolean> peligrosidad;
@@ -22,11 +21,10 @@ public class ResiduosPeligrosos extends Bitacora {
               String prestadorServicio, String residuo, String faseManejo, int matriculaUsuario,
               float cantidadGenerada, HashMap<String, String> fechaSalida,
               HashMap<String, Boolean> peligrosidad, int numeroManifiesto, int numeroAutorizacion) {
-        super(idUsuario, fechaIngreso);
+        super(idUsuario, fechaIngreso, matriculaUsuario);
         this.prestadorServicio = prestadorServicio;
         this.residuo = residuo;
         this.faseManejo = faseManejo;
-        this.matriculaUsuario = matriculaUsuario;
         this.cantidadGenerada = cantidadGenerada;
         this.fechaSalida = fechaSalida;
         this.peligrosidad = peligrosidad;
@@ -56,14 +54,6 @@ public class ResiduosPeligrosos extends Bitacora {
 
     public void setFaseManejo(String faseManejo) {
         this.faseManejo = faseManejo;
-    }
-
-    public int getMatriculaUsuario() {
-        return matriculaUsuario;
-    }
-
-    public void setMatriculaUsuario(int matriculaUsuario) {
-        this.matriculaUsuario = matriculaUsuario;
     }
 
     public float getCantidadGenerada() {

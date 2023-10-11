@@ -19,6 +19,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 
 public class DatabaseSGA {
@@ -57,7 +60,7 @@ public class DatabaseSGA {
              .child(userId)
              .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot snapshot) {
+                    public void onDataChange(@NotNull DataSnapshot snapshot) {
                         Usuario user = snapshot.getValue(Usuario.class);
                         if (user == null) return;
 
@@ -72,11 +75,11 @@ public class DatabaseSGA {
                             menu.putExtra(datosUsuario, user);
                         }
                         context.startActivity(menu);
-                        Toast.makeText(context, "Hola, " + user.getNombre()
+                        Toast.makeText(context, "Bienvenido " + user.getNombre()
                                 + " " + user.getApellidoPaterno(), Toast.LENGTH_SHORT).show();
                     }
                     @Override
-                    public void onCancelled(DatabaseError error) {
+                    public void onCancelled(@NotNull DatabaseError error) {
                         Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -88,41 +91,41 @@ public class DatabaseSGA {
              .setValue(usuario)
              .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
-                public void onComplete(Task<Void> task) {
+                public void onComplete(@NotNull Task<Void> task) {
                     Toast.makeText(context, "Cuenta creada satisfactoriamente.",
                             Toast.LENGTH_SHORT).show();
                 }
             })
             .addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onFailure(Exception error) {
+                public void onFailure(@NotNull Exception error) {
                     Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
         });
     }
 
-    public void verificarNodo(String path) {
-
+    public void verificarNodo (String path) {
         dbRef.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if(!snapshot.exists()) {
+            public void onDataChange (@NotNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
                     dbRef.child(path).setValue(0);
                 }
             }
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled (@NotNull DatabaseError error) {
                 Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     public void registrarDatosBitacora(String path, String nodo, Bitacora datos){
+
         dbRef.child(path)
              .get()
              .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
-                public void onComplete(Task<DataSnapshot> task) {
+                public void onComplete(@NotNull Task<DataSnapshot> task) {
                     if (task.isSuccessful()) {
                         Integer contador = task.getResult().getValue(Integer.class);
                         HashMap <String, Object> updates = new HashMap<>();
@@ -132,14 +135,14 @@ public class DatabaseSGA {
                         dbRef.updateChildren(updates)
                              .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
-                                public void onComplete(Task<Void> task) {
+                                public void onComplete(@NotNull Task<Void> task) {
                                     Toast.makeText(context, "Registro guardado correctamente.",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             })
                              .addOnFailureListener(new OnFailureListener() {
                                 @Override
-                                public void onFailure(Exception e) {
+                                public void onFailure(@NotNull Exception e) {
                                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -147,7 +150,7 @@ public class DatabaseSGA {
                 }
            }).addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onFailure(Exception e) {
+                public void onFailure(@NotNull Exception e) {
                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
            });

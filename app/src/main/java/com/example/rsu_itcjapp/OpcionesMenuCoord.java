@@ -26,6 +26,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -95,7 +97,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                 databaseSGA.getDbRef().child(path).get()
                         .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                             @Override
-                            public void onComplete(Task<DataSnapshot> task) {
+                            public void onComplete(@NotNull Task<DataSnapshot> task) {
                                 Aviso aviso = task.getResult().getValue(Aviso.class);
                                 if (aviso != null) {
                                     txtTitulo.setText(aviso.getTitulo());
@@ -138,7 +140,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                 databaseSGA.getDbRef().child(path).setValue(aviso)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
-                            public void onComplete(Task<Void> task) {
+                            public void onComplete(@NotNull Task<Void> task) {
                                 if(task.isSuccessful()) {
                                     Toast.makeText(OpcionesMenuCoord.this,
                                             "Aviso guardado correctamente.", Toast.LENGTH_SHORT).show();
@@ -147,7 +149,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
-                            public void onFailure(Exception e) {
+                            public void onFailure(@NotNull Exception e) {
                                 Toast.makeText(OpcionesMenuCoord.this, e.getMessage(),
                                         Toast.LENGTH_SHORT).show();
                             }
@@ -181,7 +183,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
             else if (dias >= 60) rep = 1;
 
         } catch (Exception ex) {
-            System.out.println("Error en método calcularReporte= "+ex.getMessage());
+            System.out.println(ex.getMessage());
         }
         return rep;
     }
@@ -197,7 +199,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
         databaseSGA.getDbRef().child(Constantes.USUARIOS)
                 .addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
                 Iterable<DataSnapshot> snapshotIterable = snapshot.getChildren();
                 datosReportesBim.clear();
                 for (DataSnapshot dataSnapshot : snapshotIterable) {
@@ -229,7 +231,7 @@ public class OpcionesMenuCoord extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(@NotNull DatabaseError error) {
                 Toast.makeText(OpcionesMenuCoord.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

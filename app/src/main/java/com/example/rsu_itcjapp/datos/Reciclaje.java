@@ -12,9 +12,9 @@ public class Reciclaje extends Bitacora {
 
     }
 
-    public Reciclaje(Usuario usuario, HashMap<String, String> fechaIngreso, int tapasRecolectadas,
+    public Reciclaje(int matriculaUsuario, HashMap<String, String> fechaIngreso, int tapasRecolectadas,
                      int botellasRecolectadas, int botesAluminio, String idUsuario) {
-        super(usuario, fechaIngreso, idUsuario);
+        super(idUsuario, fechaIngreso, matriculaUsuario);
         this.tapasRecolectadas = tapasRecolectadas;
         this.botellasRecolectadas = botellasRecolectadas;
         this.botesAluminio = botesAluminio;

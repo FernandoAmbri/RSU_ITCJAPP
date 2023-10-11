@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RSU-ITCJAPP</string>
+    <string name="app_name">SGA-ITCJ</string>
     <string name="btn_coordinador">Coordinador</string>
     <string name="btn_alumno">Alumno</string>
     <string name="btn_entrar_alumno">Entrar</string>

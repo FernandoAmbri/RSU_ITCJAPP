@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.regex.Pattern;
 
 public class LoginUsuarios extends AppCompatActivity {
@@ -96,15 +98,6 @@ public class LoginUsuarios extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onStart(){
-        super.onStart();
-        if (databaseSGA.getUser() != null) {
-            databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
-            finish();
-        }
-    }
-
     private void ocultarTeclado(View view) {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -116,7 +109,7 @@ public class LoginUsuarios extends AppCompatActivity {
              .addOnCompleteListener(LoginUsuarios.this,
                 new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(Task<AuthResult> task) {
+                    public void onComplete(@NotNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
                             finish();
@@ -128,7 +121,7 @@ public class LoginUsuarios extends AppCompatActivity {
             })
             .addOnFailureListener(LoginUsuarios.this, new OnFailureListener() {
                     @Override
-                    public void onFailure(Exception e) {
+                    public void onFailure(@NotNull Exception e) {
                         Toast.makeText(getApplicationContext(), e.getMessage(),
                                 Toast.LENGTH_SHORT).show();
                     }

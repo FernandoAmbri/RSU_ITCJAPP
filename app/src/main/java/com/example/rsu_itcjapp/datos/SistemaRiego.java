@@ -11,13 +11,13 @@ public class SistemaRiego extends Bitacora {
     private int duracionMin;
     private String observaciones;
 
-    public SistemaRiego(){
+    public SistemaRiego() {
 
     }
 
-    public SistemaRiego(Usuario usuario, HashMap<String, String> fechaRiego, String area, String tipoRiego,
+    public SistemaRiego(int matriculaUsuario, HashMap<String, String> fechaRiego, String area, String tipoRiego,
                 String turno, String hora, int duracionMin, String observaciones, String idUsuario) {
-        super(usuario, fechaRiego, idUsuario);
+        super(idUsuario, fechaRiego, matriculaUsuario);
         this.areaRiego = area;
         this.tipoRiego = tipoRiego;
         this.turno = turno;
@@ -26,12 +26,12 @@ public class SistemaRiego extends Bitacora {
         this.observaciones = observaciones;
     }
 
-    public String getArea() {
+    public String getAreaRiego() {
         return areaRiego;
     }
 
-    public void setArea(String area) {
-        this.areaRiego = area;
+    public void setAreaRiego(String areaRiego) {
+        this.areaRiego = areaRiego;
     }
 
     public String getTipoRiego() {

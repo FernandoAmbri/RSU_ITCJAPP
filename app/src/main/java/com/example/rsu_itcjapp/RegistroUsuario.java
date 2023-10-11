@@ -113,12 +113,12 @@ public class RegistroUsuario extends AppCompatActivity {
                     return;
                 }
 
-                if(matricula.length() < 8) {
+                if (matricula.length() < 8) {
                     txtMatricula.setError("Matricula incorrecta.");
                     return;
                 }
 
-                if(!pattern.matcher(correo).matches()) {
+                if (!pattern.matcher(correo).matches()) {
                     txtCorreo.setError("Correo no válido.");
                     return;
                 }
@@ -141,15 +141,6 @@ public class RegistroUsuario extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    public void onStart(){
-        super.onStart();
-        if (databaseSGA.getUser() != null) {
-            databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
-            finish();
-        }
     }
 
     private void ocultarTeclado(View view) {

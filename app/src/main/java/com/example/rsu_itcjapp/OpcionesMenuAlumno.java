@@ -2,6 +2,7 @@ package com.example.rsu_itcjapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class OpcionesMenuAlumno extends AppCompatActivity {
 
@@ -72,7 +74,7 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
             case Constantes.RESIDUOSPELIGROSOS:
                 registrarDatosResiduosPeligrosos();
                 break;
-            case Constantes.SISTEMADERIEGO:;
+            case Constantes.SISTEMADERIEGO:
                 registrarDatosSistemaRiego();
                 break;
             case Constantes.ENVIARCORREO:
@@ -189,23 +191,11 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 String botesAluminio = txtBotesAlum.getText().toString().trim();
                 String fecha = txtFecha.getText().toString();
 
-                int tapas = 0, botellas = 0, botes = 0;
+                ocultarTeclado(view);
 
-                if (!TextUtils.isEmpty(cantidadTapas)) {
-                    tapas = Integer.parseInt(cantidadTapas);
-                }
-
-                if (!TextUtils.isEmpty(cantidadBotellas)) {
-                    botellas = Integer.parseInt(cantidadBotellas);
-                }
-
-                if (!TextUtils.isEmpty(botesAluminio)) {
-                    botes = Integer.parseInt(botesAluminio);
-                }
-
-                if (tapas < 1 && botellas < 1 && botes < 1) {
+                if (cantidadTapas.isEmpty() || cantidadBotellas.isEmpty() || botesAluminio.isEmpty()) {
                     Toast.makeText(OpcionesMenuAlumno.this,
-                            "Es necesario introducir una cantidad.", Toast.LENGTH_SHORT).show();
+                            "Campo vacío.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -214,11 +204,12 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                     return;
                 }
 
-                ocultarTeclado(view);
-                Alumno alum = new Alumno (alumno.getNombre(), alumno.getApellidoPaterno(),
-                                                alumno.getApellidoMaterno(), alumno.getMatricula());
+                int tapas = Integer.parseInt(cantidadTapas);
+                int botellas = Integer.parseInt(cantidadBotellas);
+                int botes = Integer.parseInt(botesAluminio);
 
-                Reciclaje reciclaje = new Reciclaje (alum, fechaIngreso, tapas, botellas, botes, idUsuario);
+                Reciclaje reciclaje =
+                        new Reciclaje (alumno.getMatricula(), fechaIngreso, tapas, botellas, botes, idUsuario);
                 databaseSGA.registrarDatosBitacora(path, nodo, reciclaje);
 
                 txtTapasRec.setText("");
@@ -251,9 +242,9 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         actDepartamento.setAdapter(adapterDepartamento);
         actCategoria.setAdapter(adapterCategorias);
 
-        databaseSGA.verificarNodo("contadores/marcadoresBitacoraContador");
-        databaseSGA.verificarNodo("contadores/pilasBitacoraContador");
-        databaseSGA.verificarNodo("contadores/tonersBitacoraContador");
+        databaseSGA.verificarNodo(Constantes.PATH_MARCADORES);
+        databaseSGA.verificarNodo(Constantes.PATH_PILAS);
+        databaseSGA.verificarNodo(Constantes.PATH_TONERS);
 
         txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -271,33 +262,33 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                String cantidad = txtCantidad.getText().toString().trim();
                String departamento = actDepartamento.getText().toString();
                String fecha = txtFecha.getText().toString();
-               String path = "contadores/"+categoriaMpt+"BitacoraContador";
 
-               if(categoriaMpt.isEmpty() || cantidad.isEmpty() || departamento.isEmpty()) {
-                   Toast.makeText(OpcionesMenuAlumno.this, "Campo vacío.",
+               String path = "contadores/"+categoriaMpt+"BitacoraContador";
+               String nodo = categoriaMpt+"Bitacora/";
+
+               ocultarTeclado(view);
+
+               if (categoriaMpt.isEmpty() || departamento.isEmpty()) {
+                   Toast.makeText(OpcionesMenuAlumno.this, "Campo vacío",
                            Toast.LENGTH_SHORT).show();
+                   return;
+               }
+
+               if (cantidad.isEmpty()) {
+                   txtCantidad.setError("Cantidad no válida");
+                   return;
+               }
+
+               if (fecha.isEmpty()) {
+                   txtFecha.setError("Campo vacío.");
                    return;
                }
 
                int cantidadMpt = Integer.parseInt(cantidad);
 
-               if(cantidadMpt < 1) {
-                   txtCantidad.setError("Cantidad no válida");
-                   return;
-               }
-
-               if(fecha.isEmpty()) {
-                   txtFecha.setError("Campo vacío");
-                   return;
-               }
-
-               ocultarTeclado(view);
-
-               Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
-                                                alumno.getApellidoMaterno(), alumno.getMatricula());
                MarcadoresPilas marcadoresPilas =
-                       new MarcadoresPilas(alum, fechaIngreso, cantidadMpt, departamento, idUsuario);
-               databaseSGA.registrarDatosBitacora(path, categoriaMpt+"Bitacora/", marcadoresPilas);
+                       new MarcadoresPilas(alumno.getMatricula(), fechaIngreso, cantidadMpt, departamento, idUsuario);
+               databaseSGA.registrarDatosBitacora(path, nodo, marcadoresPilas);
 
                txtCantidad.setText("");
                actDepartamento.setText("");
@@ -391,12 +382,15 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 String prestadorServicio = txtPrestadorServicio.getText().toString().trim();
                 String numeroAutorizacion = txtNumeroAut.getText().toString().trim();
 
-                float residuoKg = 0;
+                ocultarTeclado(view);
+
                 int numManifiesto = 0;
                 int numAutorizacion = 0;
 
-                if(!TextUtils.isEmpty(cantidadResiduoKg)) {
-                    residuoKg = Float.parseFloat(cantidadResiduoKg);
+                if(cantidadResiduoKg.isEmpty() || nombreResiduo.isEmpty()) {
+                    Toast.makeText(OpcionesMenuAlumno.this,
+                            "Campo vacío", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 if(!TextUtils.isEmpty(noManifiesto)) {
@@ -407,23 +401,13 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                     numAutorizacion = Integer.parseInt(numeroAutorizacion);
                 }
 
-                if(TextUtils.isEmpty(nombreResiduo)) {
-                    actResiduo.setError("Falta seleccionar error");
-                    return;
-                }
-
-                if(residuoKg < 1) {
-                    txtCantidadResiduo.setError("Cantidad no válida");
-                    return;
-                }
-
-                if(codigosPeligrosidad <= 0) {
+                if(codigosPeligrosidad < 1) {
                     Toast.makeText(OpcionesMenuAlumno.this,
                             "Falta seleccionar código(s) de peligrosidad.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                ocultarTeclado(view);
+                float residuoKg = Float.parseFloat(cantidadResiduoKg);
 
                 ResiduosPeligrosos residuosPeligrosos =
                         new ResiduosPeligrosos(fechaIngreso, idUsuario, prestadorServicio, nombreResiduo,
@@ -496,11 +480,13 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 String fechaRiego = txtFechaRiego.getText().toString();
                 String horaRiego = txtHoraInicio.getText().toString();
                 String duracion = txtDuracion.getText().toString().trim();
-                String observaciones = txtObservaciones.getText().toString().trim();
+                String observaciones = txtObservaciones.getText().toString();
+
+                ocultarTeclado(view);
 
                 if (TextUtils.isEmpty(area) || TextUtils.isEmpty(tipoRiego) || TextUtils.isEmpty(turno)
                         || TextUtils.isEmpty(horaRiego) || TextUtils.isEmpty(duracion)) {
-                            Toast.makeText(OpcionesMenuAlumno.this, "Campo vacio.",
+                            Toast.makeText(OpcionesMenuAlumno.this, "Campo vacío.",
                                 Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -512,16 +498,9 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
                 int duracionRiego = Integer.parseInt(duracion);
 
-                if (duracionRiego < 1) {
-                    txtDuracion.setError("Cantidad no válida");
-                    return;
-                }
-
-                ocultarTeclado(view);
-                Alumno alum = new Alumno(alumno.getNombre(), alumno.getApellidoPaterno(),
-                                                alumno.getApellidoMaterno(), alumno.getMatricula());
-                SistemaRiego sistemaRiego = new SistemaRiego(alum, fechaIngreso, area, tipoRiego,
+                SistemaRiego sistemaRiego = new SistemaRiego(alumno.getMatricula(), fechaIngreso, area, tipoRiego,
                                             turno, horaRiego, duracionRiego, observaciones, idUsuario);
+
                 databaseSGA.registrarDatosBitacora(path, nodo, sistemaRiego);
 
                 txtArea.setText("");
@@ -544,6 +523,8 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
 
         Button btnEnviarCorreo = (Button) findViewById(R.id.btn_enviar_correo);
 
+        txtDestinatario.setText(Constantes.CORREO_DIR);
+
         btnEnviarCorreo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -552,33 +533,42 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
                 String asunto = txtAsunto.getText().toString();
                 String mensaje = txtMensaje.getText().toString();
 
-                if (destinatario.isEmpty()) {
-                    txtDestinatario.setError("Falta destinatario.");
+                String expresion = "^[\\w+_.-]+@[\\w+.-]+$";
+                Pattern pattern = Pattern.compile(expresion, Pattern.CASE_INSENSITIVE);
+
+                if (destinatario.isEmpty() || !pattern.matcher(destinatario).matches()) {
+                    txtDestinatario.setError("Campo no válido");
                     return;
                 }
 
                 if (asunto.isEmpty()) {
-                    txtAsunto.setError("Falta introducir asunto.");
+                    txtAsunto.setError("Falta introducir asunto");
                     return;
                 }
 
                 if (mensaje.isEmpty()) {
-                    txtMensaje.setError("Mensaje vacío.");
+                    txtMensaje.setError("Mensaje vacío");
                     return;
                 }
 
                 ocultarTeclado(view);
 
-                Intent correo = new Intent(Intent.ACTION_SEND);
+                try {
+                    Intent correo = new Intent(Intent.ACTION_SEND);
 
-                correo.putExtra(Intent.EXTRA_EMAIL, new String[]{destinatario});
-                correo.putExtra(Intent.EXTRA_SUBJECT, asunto);
-                correo.putExtra(Intent.EXTRA_TEXT, mensaje);
+                    correo.setData(Uri.parse("mailto:"));
+                    correo.setType("text/plain");
 
-                correo.setData(Uri.parse("mailto:"));
-                correo.setType("text/plain");
+                    correo.putExtra(Intent.EXTRA_EMAIL, new String[]{ destinatario });
+                    correo.putExtra(Intent.EXTRA_SUBJECT, asunto);
+                    correo.putExtra(Intent.EXTRA_TEXT, mensaje);
 
-                startActivity(Intent.createChooser(correo, "Enviar correo"));
+                    startActivity(Intent.createChooser(correo, "Enviar correo"));
+
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(OpcionesMenuAlumno.this, e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
 
                 txtDestinatario.setText("");
                 txtAsunto.setText("");
@@ -588,6 +578,12 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
     }
 
     private void mostrarDatosCuenta() {
+
+        String fechaInicio = alumno.getResidenciasInicio().get("dia")+"/"
+                +alumno.getResidenciasInicio().get("mes")+"/"+alumno.getResidenciasInicio().get("anho");
+
+        String fechaFin = alumno.getResidenciasFin().get("dia")+"/"
+                +alumno.getResidenciasFin().get("mes")+"/"+alumno.getResidenciasFin().get("anho");
 
         TextInputEditText txtNombreUsuario = (TextInputEditText) findViewById(R.id.txt_nombre_inf);
         TextInputEditText txtApellidoPaterno = (TextInputEditText) findViewById(R.id.txt_apellidoPaterno_inf);
@@ -608,12 +604,6 @@ public class OpcionesMenuAlumno extends AppCompatActivity {
         txtCarrera.setText(alumno.getCarrera());
         txtMatricula.setText(String.valueOf(alumno.getMatricula()));
         txtCorreo.setText(databaseSGA.getUser().getEmail());
-
-        String fechaInicio = alumno.getResidenciasInicio().get("dia")+"/"
-                +alumno.getResidenciasInicio().get("mes")+"/"+alumno.getResidenciasInicio().get("anho");
-
-        String fechaFin = alumno.getResidenciasFin().get("dia")+"/"
-                +alumno.getResidenciasFin().get("mes")+"/"+alumno.getResidenciasFin().get("anho");
 
         txtFechaInicio.setText(fechaInicio);
         txtFechaFinal.setText(fechaFin);

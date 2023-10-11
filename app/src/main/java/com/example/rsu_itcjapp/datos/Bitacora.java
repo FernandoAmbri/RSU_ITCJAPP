@@ -4,32 +4,18 @@ import java.util.HashMap;
 
 public class Bitacora {
 
-    private String idUsuario;
-    private Usuario usuario;
     private HashMap<String, String> fechaIngreso;
+    private String idUsuario;
+    private int matriculaUsuario;
 
-
-    public Bitacora(){
+    public Bitacora() {
 
     }
 
-    public Bitacora(String idUsuario, HashMap<String, String> fechaIngreso) {
+    public Bitacora(String idUsuario, HashMap<String, String> fechaIngreso, int matriculaUsuario){
         this.idUsuario = idUsuario;
         this.fechaIngreso = fechaIngreso;
-    }
-
-    public Bitacora(Usuario usuario, HashMap<String, String> fechaIngreso, String idUsuario){
-        this.usuario = usuario;
-        this.fechaIngreso = fechaIngreso;
-        this.idUsuario = idUsuario;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+        this.matriculaUsuario = matriculaUsuario;
     }
 
     public HashMap<String, String> getFechaIngreso() {
@@ -42,5 +28,13 @@ public class Bitacora {
 
     public String getIdUsuario() {
         return idUsuario;
+    }
+
+    public int getMatriculaUsuario() {
+        return matriculaUsuario;
+    }
+
+    public void setMatriculaUsuario(int matriculaUsuario) {
+        this.matriculaUsuario = matriculaUsuario;
     }
 }

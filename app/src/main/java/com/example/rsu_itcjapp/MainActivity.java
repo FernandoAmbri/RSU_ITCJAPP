@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         if (databaseSGA.getUser() != null) {
             databaseSGA.obtenerUsuario(Constantes.USUARIO, Constantes.DATOS_USUARIO);
-            finish();
         }
     }
 

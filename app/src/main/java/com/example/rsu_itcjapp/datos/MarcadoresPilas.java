@@ -2,18 +2,18 @@ package com.example.rsu_itcjapp.datos;
 
 import java.util.HashMap;
 
-public class MarcadoresPilas extends Bitacora{
+public class MarcadoresPilas extends Bitacora {
 
     private int cantidad;
     private String departamento;
 
-    public MarcadoresPilas(){
+    public MarcadoresPilas() {
 
     }
 
-    public MarcadoresPilas(Usuario usuario, HashMap<String, String> fechaIngreso, int cantidad,
+    public MarcadoresPilas (int matriculaUsuario, HashMap<String, String> fechaIngreso, int cantidad,
                            String departamento, String idUsuario) {
-        super(usuario, fechaIngreso, idUsuario);
+        super(idUsuario, fechaIngreso, matriculaUsuario);
         this.cantidad = cantidad;
         this.departamento = departamento;
     }
