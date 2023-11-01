@@ -52,6 +52,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, LoginUsuarios.class);
         intent.putExtra(usuario, tipoUsuario);
         startActivity(intent);
-        finish();
     }
 }
